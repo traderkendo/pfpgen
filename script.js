@@ -36,8 +36,6 @@ document.getElementById('distort').addEventListener('click', distortImage);
 document.getElementById('cut').addEventListener('click', startCut);
 document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('undo').addEventListener('click', undoAction);
-document.getElementById('bringForward').addEventListener('click', bringForward);
-document.getElementById('sendBackward').addEventListener('click', sendBackward);
 
 let history = [];
 const maxHistorySize = 30;
@@ -92,7 +90,6 @@ function zoomImage(factor) {
         }
     });
     updateHistory(); // Add state to history
-    updateLayerManager(); // Update layer manager
     canvas.renderAll();
 }
 
@@ -102,7 +99,6 @@ function distortImage() {
         activeObject.set('skewX', 20);
         activeObject.set('skewY', 20);
         updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     }
 }
@@ -163,7 +159,6 @@ function applyCut() {
     if (activeObject) {
         activeObject.set({ clipPath: new fabric.Rect(clipPath) });
         updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     }
     cutRect = null;
@@ -173,10 +168,7 @@ function toggleDrawingMode() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
     if (canvas.isDrawingMode) {
-        canvas.on('path:created', () => {
-            updateHistory();
-            updateLayerManager();
-        }); // Add state to history after drawing
+        canvas.on('path:created', updateHistory); // Add state to history after drawing
     } else {
         canvas.off('path:created', updateHistory);
     }
@@ -193,26 +185,6 @@ function undoAction() {
     }
 }
 
-function bringForward() {
-    const activeObject = canvas.getActiveObject();
-    if (activeObject) {
-        canvas.bringForward(activeObject);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
-    }
-}
-
-function sendBackward() {
-    const activeObject = canvas.getActiveObject();
-    if (activeObject) {
-        canvas.sendBackwards(activeObject);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
-    }
-}
-
 function updateHistory() {
     const state = JSON.stringify(canvas);
     history.push(state);
@@ -225,7 +197,7 @@ function updateLayerManager() {
     const layerManager = document.getElementById('layerManager');
     layerManager.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
-        if (obj !== frame) {
+        if (obj !== frame && obj.type === 'image') {
             const layerItem = document.createElement('div');
             layerItem.className = 'layer-item';
             layerItem.textContent = `Layer ${index}`;
@@ -234,45 +206,20 @@ function updateLayerManager() {
                 canvas.renderAll();
             });
 
-            const bringForwardButton = document.createElement('button');
-            bringForwardButton.textContent = '↑';
-            bringForwardButton.addEventListener('click', () => {
-                canvas.bringForward(obj);
-                updateHistory(); // Add state to history
-                updateLayerManager(); // Update layer manager
-                canvas.renderAll();
-            });
-
-            const sendBackwardButton = document.createElement('button');
-            sendBackwardButton.textContent = '↓';
-            sendBackwardButton.addEventListener('click', () => {
-                canvas.sendBackwards(obj);
-                updateHistory(); // Add state to history
-                updateLayerManager(); // Update layer manager
-                canvas.renderAll();
-            });
-
-            layerItem.appendChild(bringForwardButton);
-            layerItem.appendChild(sendBackwardButton);
-
             layerManager.appendChild(layerItem);
         }
     });
 }
 
 // Add event listeners to capture actions
-canvas.on('object:added', () => {
-    updateHistory();
-    updateLayerManager();
+canvas.on('object:added', obj => {
+    if (obj.target.type === 'image') {
+        updateHistory();
+        updateLayerManager();
+    }
 });
-canvas.on('object:modified', () => {
-    updateHistory();
-    updateLayerManager();
-});
-canvas.on('object:removed', () => {
-    updateHistory();
-    updateLayerManager();
-});
+canvas.on('object:modified', updateHistory);
+canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
