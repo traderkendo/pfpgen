@@ -167,12 +167,8 @@ function toggleDrawingMode() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
     if (canvas.isDrawingMode) {
-        canvas.on('path:created', () => {
-            updateHistory();
-            updateLayerManager();
-        }); // Add state to history after drawing
-    } else {
-        canvas.off('path:created', updateHistory);
+        canvas.freeDrawingBrush.width = 2;
+        canvas.freeDrawingBrush.color = "#000";
     }
 }
 
@@ -180,7 +176,7 @@ function undoAction() {
     if (history.length > 1) {
         history.pop();
         const state = history[history.length - 1];
-        canvas.loadFromJSON(state, function() {
+        canvas.loadFromJSON(state, () => {
             canvas.renderAll();
             updateLayerManager(); // Update layer manager
         });
@@ -218,6 +214,8 @@ canvas.on('object:added', obj => {
     if (obj.target && obj.target.type === 'image') {
         updateHistory();
         updateLayerManager();
+    } else if (obj.target && obj.target.type === 'path') {
+        updateHistory();
     }
 });
 canvas.on('object:modified', updateHistory);
