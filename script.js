@@ -11,8 +11,8 @@ document.getElementById('duplicate').addEventListener('click', duplicateImage);
 document.getElementById('zoomIn').addEventListener('click', () => zoomImage(1.1));
 document.getElementById('zoomOut').addEventListener('click', () => zoomImage(0.9));
 document.getElementById('lassoTool').addEventListener('click', toggleLassoTool);
-document.getElementById('erase').addEventListener('click', () => toggleDrawingMode('erase'));
-document.getElementById('draw').addEventListener('click', () => toggleDrawingMode('draw'));
+document.getElementById('draw').addEventListener('click', toggleDrawingMode);
+document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
 document.getElementById('undo').addEventListener('click', undoAction);
 
 let history = [];
@@ -101,15 +101,11 @@ function toggleLassoTool() {
         canvas.selection = false;
         canvas.forEachObject(obj => obj.selectable = false);
         canvas.on('mouse:down', startLasso);
-        canvas.on('mouse:move', drawLasso);
-        canvas.on('mouse:up', finishLasso);
         document.getElementById('lassoTool').textContent = 'Stop Lasso Tool';
     } else {
         canvas.selection = true;
         canvas.forEachObject(obj => obj.selectable = true);
         canvas.off('mouse:down', startLasso);
-        canvas.off('mouse:move', drawLasso);
-        canvas.off('mouse:up', finishLasso);
         if (lassoPolygon) {
             canvas.remove(lassoPolygon);
             lassoPolygon = null;
@@ -122,7 +118,8 @@ function toggleLassoTool() {
 function startLasso(event) {
     const pointer = canvas.getPointer(event.e);
     lassoPoints.push({ x: pointer.x, y: pointer.y });
-    if (!lassoPolygon) {
+
+    if (lassoPoints.length === 1) {
         lassoPolygon = new fabric.Polygon(lassoPoints, {
             fill: 'rgba(0,0,0,0.3)',
             stroke: '#000',
@@ -131,21 +128,24 @@ function startLasso(event) {
             evented: false
         });
         canvas.add(lassoPolygon);
+    } else {
+        lassoPolygon.set({ points: lassoPoints });
+        canvas.renderAll();
+    }
+
+    if (lassoPoints.length > 2 && isCloseToFirstPoint(pointer)) {
+        finishLasso();
     }
 }
 
-function drawLasso(event) {
-    if (!lassoPolygon) return;
-    const pointer = canvas.getPointer(event.e);
-    lassoPoints[lassoPoints.length - 1] = { x: pointer.x, y: pointer.y };
-    lassoPolygon.set({ points: lassoPoints });
-    canvas.renderAll();
+function isCloseToFirstPoint(pointer) {
+    const firstPoint = lassoPoints[0];
+    const distance = Math.sqrt(Math.pow(pointer.x - firstPoint.x, 2) + Math.pow(pointer.y - firstPoint.y, 2));
+    return distance < 10;
 }
 
-function finishLasso(event) {
+function finishLasso() {
     canvas.off('mouse:down', startLasso);
-    canvas.off('mouse:move', drawLasso);
-    canvas.off('mouse:up', finishLasso);
 
     const lassoPath = new Path2D();
     lassoPoints.forEach(point => lassoPath.lineTo(point.x, point.y));
@@ -180,32 +180,14 @@ function isObjectInLasso(obj, lassoPath) {
     return lassoPath.isPointInPath(objCenter.x, objCenter.y);
 }
 
-function toggleDrawingMode(mode) {
-    if (mode === 'draw') {
-        if (canvas.isDrawingMode && canvas.freeDrawingBrush.color === 'black') {
-            canvas.isDrawingMode = false;
-            document.getElementById('draw').textContent = 'Draw';
-        } else {
-            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-            canvas.freeDrawingBrush.color = 'black';
-            canvas.freeDrawingBrush.width = 2;
-            canvas.isDrawingMode = true;
-            document.getElementById('draw').textContent = 'Stop Drawing';
-            document.getElementById('erase').textContent = 'Erase';
-        }
-    } else if (mode === 'erase') {
-        if (canvas.isDrawingMode && canvas.freeDrawingBrush.color === 'white') {
-            canvas.isDrawingMode = false;
-            document.getElementById('erase').textContent = 'Erase';
-        } else {
-            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-            canvas.freeDrawingBrush.color = 'white'; // Assuming the canvas background is white
-            canvas.freeDrawingBrush.width = 10;
-            canvas.isDrawingMode = true;
-            document.getElementById('erase').textContent = 'Stop Erasing';
-            document.getElementById('draw').textContent = 'Draw';
-        }
-    }
+function toggleDrawingMode() {
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
+}
+
+function updateBrushColor(event) {
+    const color = event.target.value;
+    canvas.freeDrawingBrush.color = color;
 }
 
 function undoAction() {
