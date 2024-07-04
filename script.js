@@ -19,6 +19,7 @@ document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('undo').addEventListener('click', undoAction);
 
 let history = [];
+const maxHistorySize = 30;
 
 canvas.on('object:modified', updateHistory);
 canvas.on('object:added', updateHistory);
@@ -139,6 +140,9 @@ function undoAction() {
 function updateHistory() {
     const state = JSON.stringify(canvas);
     history.push(state);
+    if (history.length > maxHistorySize) {
+        history.shift(); // Remove the oldest state to maintain the max size
+    }
 }
 
 canvas.on('object:modified', updateHistory);
