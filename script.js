@@ -106,6 +106,11 @@ function toggleLassoTool() {
         canvas.selection = true;
         canvas.forEachObject(obj => obj.selectable = true);
         canvas.off('mouse:down', startLasso);
+        if (lassoPolygon) {
+            canvas.remove(lassoPolygon);
+            lassoPolygon = null;
+        }
+        lassoPoints = [];
         document.getElementById('lassoTool').textContent = 'Lasso Tool';
     }
 }
@@ -142,9 +147,13 @@ function isCloseToFirstPoint(pointer) {
 function finishLasso() {
     canvas.off('mouse:down', startLasso);
 
+    const lassoPath = new Path2D();
+    lassoPoints.forEach(point => lassoPath.lineTo(point.x, point.y));
+    lassoPath.closePath();
+
     const selectedObjects = canvas.getObjects().filter(obj => {
         if (obj === lassoPolygon) return false;
-        return isObjectInLasso(obj, lassoPoints);
+        return isObjectInLasso(obj, lassoPath);
     });
 
     if (selectedObjects.length > 0) {
@@ -166,9 +175,9 @@ function finishLasso() {
     document.getElementById('lassoTool').textContent = 'Lasso Tool';
 }
 
-function isObjectInLasso(obj, points) {
-    const poly = new fabric.Polygon(points);
-    return poly.containsPoint(obj.getCenterPoint());
+function isObjectInLasso(obj, lassoPath) {
+    const objCenter = obj.getCenterPoint();
+    return lassoPath.isPointInPath(objCenter.x, objCenter.y);
 }
 
 function toggleDrawingMode(mode) {
