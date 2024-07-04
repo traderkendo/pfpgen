@@ -1,24 +1,103 @@
-document.getElementById('generateButton').addEventListener('click', generateProfilePicture);
+const canvas = new fabric.Canvas('canvas');
+const pica = window.pica();
 
-function generateProfilePicture() {
-    const name = document.getElementById('nameInput').value;
-    const initials = getInitials(name);
-    const color = getRandomColor();
+document.getElementById('upload').addEventListener('change', handleUpload);
+document.getElementById('duplicate').addEventListener('click', duplicateImage);
+document.getElementById('removeBackground').addEventListener('click', removeBackground);
+document.getElementById('zoomIn').addEventListener('click', () => zoomImage(1.1));
+document.getElementById('zoomOut').addEventListener('click', () => zoomImage(0.9));
+document.getElementById('distort').addEventListener('click', distortImage);
+document.getElementById('cut').addEventListener('click', cutImage);
+document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 
-    const profilePictureElement = document.getElementById('profilePicture');
-    profilePictureElement.style.backgroundColor = color;
-    profilePictureElement.textContent = initials;
+function handleUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(f) {
+        const data = f.target.result;
+        fabric.Image.fromURL(data, function(img) {
+            canvas.add(img);
+            canvas.renderAll();
+        });
+    };
+    reader.readAsDataURL(file);
 }
 
-function getInitials(name) {
-    const nameParts = name.split(' ');
-    if (nameParts.length === 1) {
-        return nameParts[0][0].toUpperCase();
+function duplicateImage() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        const clone = fabric.util.object.clone(activeObject);
+        clone.set({ left: clone.left + 10, top: clone.top + 10 });
+        canvas.add(clone);
+        canvas.renderAll();
     }
-    return nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase();
 }
 
-function getRandomColor() {
-    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33A2', '#33FFF6', '#F633FF'];
-    return colors[Math.floor(Math.random() * colors.length)];
+function removeBackground() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject && activeObject.getSrc) {
+        const imgElement = new Image();
+        imgElement.src = activeObject.getSrc();
+        imgElement.onload = function() {
+            pica.removeBackground(imgElement).then(result => {
+                fabric.Image.fromURL(result.toDataURL(), function(img) {
+                    canvas.remove(activeObject);
+                    canvas.add(img);
+                    canvas.renderAll();
+                });
+            });
+        };
+    }
 }
+
+function zoomImage(factor) {
+    canvas.getObjects().forEach(obj => {
+        obj.scaleX *= factor;
+        obj.scaleY *= factor;
+        obj.left *= factor;
+        obj.top *= factor;
+        obj.setCoords();
+    });
+    canvas.renderAll();
+}
+
+function distortImage() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        activeObject.set('skewX', 20);
+        activeObject.set('skewY', 20);
+        canvas.renderAll();
+    }
+}
+
+function cutImage() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        canvas.remove(activeObject);
+    }
+}
+
+function toggleDrawingMode() {
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
+}
+
+canvas.on('mouse:down', function() {
+    if (!canvas.isDrawingMode) return;
+    canvas.on('mouse:move', function(event) {
+        const pointer = canvas.getPointer(event.e);
+        const points = [pointer.x, pointer.y, pointer.x + 2, pointer.y + 2];
+        const line = new fabric.Line(points, {
+            strokeWidth: 2,
+            fill: '#000',
+            stroke: '#000',
+            originX: 'center',
+            originY: 'center'
+        });
+        canvas.add(line);
+    });
+});
+
+canvas.on('mouse:up', function() {
+    canvas.off('mouse:move');
+});
