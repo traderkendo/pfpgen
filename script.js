@@ -18,6 +18,20 @@ document.getElementById('undo').addEventListener('click', undoAction);
 let history = [];
 const maxHistorySize = 30;
 
+// Function to adjust image to fit the frame
+function adjustImageToFrame(img) {
+    const scaleX = frameWidth / img.width;
+    const scaleY = frameHeight / img.height;
+    const scale = Math.min(scaleX, scaleY);
+    img.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: (canvas.width - img.width * scale) / 2,
+        top: (canvas.height - img.height * scale) / 2
+    });
+}
+
+// Load initial image
 fabric.Image.fromURL(mainImageUrl, function(img) {
     adjustImageToFrame(img);
     canvas.add(img);
@@ -152,6 +166,14 @@ function applyCut() {
 function toggleDrawingMode() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
+    if (canvas.isDrawingMode) {
+        canvas.on('path:created', () => {
+            updateHistory();
+            updateLayerManager();
+        }); // Add state to history after drawing
+    } else {
+        canvas.off('path:created', updateHistory);
+    }
 }
 
 function undoAction() {
@@ -188,18 +210,6 @@ function updateLayerManager() {
 
             layerManager.appendChild(layerItem);
         }
-    });
-}
-
-function adjustImageToFrame(img) {
-    const scaleX = frameWidth / img.width;
-    const scaleY = frameHeight / img.height;
-    const scale = Math.min(scaleX, scaleY);
-    img.set({
-        scaleX: scale,
-        scaleY: scale,
-        left: (canvas.width - img.width * scale) / 2,
-        top: (canvas.height - img.height * scale) / 2
     });
 }
 
