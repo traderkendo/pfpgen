@@ -38,6 +38,9 @@ button:hover, input[type="file"] {
 #layerManager {
     margin-top: 20px;
     text-align: left;
+    width: 400px; /* Ensure it matches the canvas/frame width */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .layer-item {
@@ -48,6 +51,7 @@ button:hover, input[type="file"] {
     border: 1px solid #ccc;
     margin-bottom: 5px;
     cursor: pointer;
+    border-radius: 4px;
 }
 
 .layer-item.active {
