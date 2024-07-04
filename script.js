@@ -10,13 +10,16 @@ document.getElementById('addImage').addEventListener('click', addMainImage);
 document.getElementById('duplicate').addEventListener('click', duplicateImage);
 document.getElementById('zoomIn').addEventListener('click', () => zoomImage(1.1));
 document.getElementById('zoomOut').addEventListener('click', () => zoomImage(0.9));
-document.getElementById('cut').addEventListener('click', startCut);
+document.getElementById('lassoTool').addEventListener('click', toggleLassoTool);
 document.getElementById('erase').addEventListener('click', () => toggleDrawingMode('erase'));
 document.getElementById('draw').addEventListener('click', () => toggleDrawingMode('draw'));
 document.getElementById('undo').addEventListener('click', undoAction);
 
 let history = [];
 const maxHistorySize = 30;
+let lassoPoints = [];
+let lassoPolygon = null;
+let lassoMode = false;
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
@@ -92,65 +95,80 @@ function zoomImage(factor) {
     }
 }
 
-let isCutting = false;
-let cutRect = null;
-
-function startCut() {
-    if (!isCutting) {
+function toggleLassoTool() {
+    lassoMode = !lassoMode;
+    if (lassoMode) {
         canvas.selection = false;
         canvas.forEachObject(obj => obj.selectable = false);
-        canvas.on('mouse:down', initiateCut);
+        canvas.on('mouse:down', startLasso);
+        document.getElementById('lassoTool').textContent = 'Stop Lasso Tool';
     } else {
         canvas.selection = true;
         canvas.forEachObject(obj => obj.selectable = true);
-        canvas.off('mouse:down', initiateCut);
+        canvas.off('mouse:down', startLasso);
+        document.getElementById('lassoTool').textContent = 'Lasso Tool';
     }
-    isCutting = !isCutting;
 }
 
-function initiateCut(event) {
-    if (cutRect) {
-        canvas.remove(cutRect);
+function startLasso(event) {
+    const pointer = canvas.getPointer(event.e);
+    lassoPoints.push({ x: pointer.x, y: pointer.y });
+
+    if (lassoPoints.length === 1) {
+        lassoPolygon = new fabric.Polygon(lassoPoints, {
+            fill: 'rgba(0,0,0,0.3)',
+            stroke: '#000',
+            strokeWidth: 1,
+            selectable: false,
+            evented: false
+        });
+        canvas.add(lassoPolygon);
+    } else {
+        lassoPolygon.set({ points: lassoPoints });
+        canvas.renderAll();
     }
-    cutRect = new fabric.Rect({
-        left: event.pointer.x,
-        top: event.pointer.y,
-        width: 1,
-        height: 1,
-        fill: 'rgba(0,0,0,0.3)',
-        stroke: '#000',
-        strokeDashArray: [5, 5]
+
+    if (lassoPoints.length > 2 && isCloseToFirstPoint(pointer)) {
+        finishLasso();
+    }
+}
+
+function isCloseToFirstPoint(pointer) {
+    const firstPoint = lassoPoints[0];
+    const distance = Math.sqrt(Math.pow(pointer.x - firstPoint.x, 2) + Math.pow(pointer.y - firstPoint.y, 2));
+    return distance < 10;
+}
+
+function finishLasso() {
+    canvas.off('mouse:down', startLasso);
+
+    const selectedObjects = canvas.getObjects().filter(obj => {
+        if (obj === lassoPolygon) return false;
+        return isObjectInLasso(obj, lassoPoints);
     });
-    canvas.add(cutRect);
-    canvas.renderAll();
 
-    canvas.on('mouse:move', resizeCutRect);
-    canvas.on('mouse:up', finishCut);
-}
-
-function resizeCutRect(event) {
-    if (cutRect) {
-        cutRect.set({ width: event.pointer.x - cutRect.left, height: event.pointer.y - cutRect.top });
-        canvas.renderAll();
-    }
-}
-
-function finishCut() {
-    canvas.off('mouse:move', resizeCutRect);
-    canvas.off('mouse:up', finishCut);
-    applyCut();
-}
-
-function applyCut() {
-    const clipPath = cutRect.toObject();
-    canvas.remove(cutRect);
-    const activeObject = canvas.getActiveObject();
-    if (activeObject) {
-        activeObject.set({ clipPath: new fabric.Rect(clipPath) });
+    if (selectedObjects.length > 0) {
+        const group = new fabric.Group(selectedObjects, {
+            left: lassoPolygon.left,
+            top: lassoPolygon.top
+        });
+        canvas.add(group);
+        canvas.setActiveObject(group);
         updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     }
-    cutRect = null;
+
+    canvas.remove(lassoPolygon);
+    lassoPoints = [];
+    lassoPolygon = null;
+    lassoMode = false;
+    document.getElementById('lassoTool').textContent = 'Lasso Tool';
+}
+
+function isObjectInLasso(obj, points) {
+    const poly = new fabric.Polygon(points);
+    return poly.containsPoint(obj.getCenterPoint());
 }
 
 function toggleDrawingMode(mode) {
@@ -204,7 +222,7 @@ function updateLayerManager() {
     const layerManager = document.getElementById('layerManager');
     layerManager.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
-        if (obj.type === 'image') {
+        if (obj.type === 'image' || obj.type === 'group') {
             const layerItem = document.createElement('div');
             layerItem.className = 'layer-item';
             layerItem.textContent = `Layer ${index}`;
@@ -220,7 +238,7 @@ function updateLayerManager() {
 
 // Add event listeners to capture actions
 canvas.on('object:added', function(obj) {
-    if (obj.target && obj.target.type === 'image') {
+    if (obj.target && (obj.target.type === 'image' || obj.target.type === 'group')) {
         updateHistory();
         updateLayerManager();
     } else if (obj.target && obj.target.type === 'path') {
