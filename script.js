@@ -1,9 +1,26 @@
 const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 
+// Define the frame dimensions
+const frameWidth = 400;
+const frameHeight = 400;
+
+// Add a frame
+const frame = new fabric.Rect({
+    left: 50,
+    top: 50,
+    width: frameWidth,
+    height: frameHeight,
+    fill: 'transparent',
+    stroke: '#000',
+    strokeWidth: 2,
+    selectable: false
+});
+canvas.add(frame);
+
 // Load initial image
 fabric.Image.fromURL(mainImageUrl, function(img) {
-    img.set({ left: 100, top: 100 });
+    img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
     canvas.add(img);
     updateHistory(); // Add initial state to history
     canvas.renderAll();
@@ -18,6 +35,8 @@ document.getElementById('distort').addEventListener('click', distortImage);
 document.getElementById('cut').addEventListener('click', startCut);
 document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('undo').addEventListener('click', undoAction);
+document.getElementById('bringForward').addEventListener('click', bringForward);
+document.getElementById('sendBackward').addEventListener('click', sendBackward);
 
 let history = [];
 const maxHistorySize = 30;
@@ -28,6 +47,7 @@ function handleUpload(event) {
     reader.onload = function(f) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
+            img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
             canvas.add(img);
             updateHistory(); // Add state to history
             canvas.renderAll();
@@ -38,6 +58,7 @@ function handleUpload(event) {
 
 function addMainImage() {
     fabric.Image.fromURL(mainImageUrl, function(img) {
+        img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
         canvas.add(img);
         updateHistory(); // Add state to history
         canvas.renderAll();
@@ -58,11 +79,13 @@ function duplicateImage() {
 
 function zoomImage(factor) {
     canvas.getObjects().forEach(obj => {
-        obj.scaleX *= factor;
-        obj.scaleY *= factor;
-        obj.left *= factor;
-        obj.top *= factor;
-        obj.setCoords();
+        if (obj !== frame) { // Don't zoom the frame
+            obj.scaleX *= factor;
+            obj.scaleY *= factor;
+            obj.left *= factor;
+            obj.top *= factor;
+            obj.setCoords();
+        }
     });
     updateHistory(); // Add state to history
     canvas.renderAll();
@@ -154,6 +177,24 @@ function undoAction() {
         history.pop();
         const state = history[history.length - 1];
         canvas.loadFromJSON(state, canvas.renderAll.bind(canvas));
+    }
+}
+
+function bringForward() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        canvas.bringForward(activeObject);
+        updateHistory(); // Add state to history
+        canvas.renderAll();
+    }
+}
+
+function sendBackward() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        canvas.sendBackwards(activeObject);
+        updateHistory(); // Add state to history
+        canvas.renderAll();
     }
 }
 
