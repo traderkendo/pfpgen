@@ -10,14 +10,13 @@ document.getElementById('addImage').addEventListener('click', addMainImage);
 document.getElementById('duplicate').addEventListener('click', duplicateImage);
 document.getElementById('zoomIn').addEventListener('click', () => zoomImage(1.1));
 document.getElementById('zoomOut').addEventListener('click', () => zoomImage(0.9));
-document.getElementById('lassoTool').addEventListener('click', toggleLassoTool);
 document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
+document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 
 let history = [];
 const maxHistorySize = 30;
-let lassoToolEnabled = false;
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
@@ -93,56 +92,6 @@ function zoomImage(factor) {
     }
 }
 
-function toggleLassoTool() {
-    lassoToolEnabled = !lassoToolEnabled;
-    if (lassoToolEnabled) {
-        enableLassoTool();
-    } else {
-        disableLassoTool();
-    }
-}
-
-function enableLassoTool() {
-    const lasso = d3.lasso()
-        .items(d3.selectAll('.fabric-object'))
-        .closePathDistance(100)
-        .closePathSelect(true)
-        .hoverSelect(true)
-        .area(d3.select('canvas'))
-        .on('start', lassoStart)
-        .on('draw', lassoDraw)
-        .on('end', lassoEnd);
-
-    d3.select('canvas').call(lasso);
-
-    document.getElementById('lassoTool').textContent = 'Stop Lasso Tool';
-}
-
-function disableLassoTool() {
-    document.getElementById('lassoTool').textContent = 'Lasso Tool';
-    // Remove lasso event listeners
-    d3.select('canvas').on('.drag', null);
-}
-
-function lassoStart() {
-    console.log('Lasso started');
-}
-
-function lassoDraw() {
-    console.log('Lasso drawing');
-}
-
-function lassoEnd() {
-    const selectedItems = d3.selectAll('.lasso .possible');
-    selectedItems.each(function(d) {
-        const obj = d3.select(this).datum();
-        canvas.remove(canvas.getObjects()[obj.index]);
-    });
-    updateHistory();
-    updateLayerManager();
-    canvas.renderAll();
-}
-
 function toggleDrawingMode() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
@@ -151,6 +100,11 @@ function toggleDrawingMode() {
 function updateBrushColor(event) {
     const color = event.target.value;
     canvas.freeDrawingBrush.color = color;
+}
+
+function updateBrushSize(event) {
+    const size = event.target.value;
+    canvas.freeDrawingBrush.width = parseInt(size, 10);
 }
 
 function undoAction() {
