@@ -101,11 +101,15 @@ function toggleLassoTool() {
         canvas.selection = false;
         canvas.forEachObject(obj => obj.selectable = false);
         canvas.on('mouse:down', startLasso);
+        canvas.on('mouse:move', drawLasso);
+        canvas.on('mouse:up', finishLasso);
         document.getElementById('lassoTool').textContent = 'Stop Lasso Tool';
     } else {
         canvas.selection = true;
         canvas.forEachObject(obj => obj.selectable = true);
         canvas.off('mouse:down', startLasso);
+        canvas.off('mouse:move', drawLasso);
+        canvas.off('mouse:up', finishLasso);
         if (lassoPolygon) {
             canvas.remove(lassoPolygon);
             lassoPolygon = null;
@@ -118,8 +122,7 @@ function toggleLassoTool() {
 function startLasso(event) {
     const pointer = canvas.getPointer(event.e);
     lassoPoints.push({ x: pointer.x, y: pointer.y });
-
-    if (lassoPoints.length === 1) {
+    if (!lassoPolygon) {
         lassoPolygon = new fabric.Polygon(lassoPoints, {
             fill: 'rgba(0,0,0,0.3)',
             stroke: '#000',
@@ -128,24 +131,21 @@ function startLasso(event) {
             evented: false
         });
         canvas.add(lassoPolygon);
-    } else {
-        lassoPolygon.set({ points: lassoPoints });
-        canvas.renderAll();
-    }
-
-    if (lassoPoints.length > 2 && isCloseToFirstPoint(pointer)) {
-        finishLasso();
     }
 }
 
-function isCloseToFirstPoint(pointer) {
-    const firstPoint = lassoPoints[0];
-    const distance = Math.sqrt(Math.pow(pointer.x - firstPoint.x, 2) + Math.pow(pointer.y - firstPoint.y, 2));
-    return distance < 10;
+function drawLasso(event) {
+    if (!lassoPolygon) return;
+    const pointer = canvas.getPointer(event.e);
+    lassoPoints[lassoPoints.length - 1] = { x: pointer.x, y: pointer.y };
+    lassoPolygon.set({ points: lassoPoints });
+    canvas.renderAll();
 }
 
-function finishLasso() {
+function finishLasso(event) {
     canvas.off('mouse:down', startLasso);
+    canvas.off('mouse:move', drawLasso);
+    canvas.off('mouse:up', finishLasso);
 
     const lassoPath = new Path2D();
     lassoPoints.forEach(point => lassoPath.lineTo(point.x, point.y));
