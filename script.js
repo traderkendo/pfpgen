@@ -1,31 +1,9 @@
 const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 
-// Define the frame dimensions
-const frameWidth = 400;
-const frameHeight = 400;
-
-// Add a frame
-const frame = new fabric.Rect({
-    left: 50,
-    top: 50,
-    width: frameWidth,
-    height: frameHeight,
-    fill: 'transparent',
-    stroke: '#000',
-    strokeWidth: 2,
-    selectable: false
-});
-canvas.add(frame);
-
-// Load initial image
-fabric.Image.fromURL(mainImageUrl, function(img) {
-    img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
-    canvas.add(img);
-    updateHistory(); // Add initial state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
-});
+// Define the generator frame dimensions
+const frameWidth = 500;
+const frameHeight = 500;
 
 document.getElementById('upload').addEventListener('change', handleUpload);
 document.getElementById('addImage').addEventListener('click', addMainImage);
@@ -40,13 +18,21 @@ document.getElementById('undo').addEventListener('click', undoAction);
 let history = [];
 const maxHistorySize = 30;
 
+fabric.Image.fromURL(mainImageUrl, function(img) {
+    adjustImageToFrame(img);
+    canvas.add(img);
+    updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
+});
+
 function handleUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onload = function(f) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
-            img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
+            adjustImageToFrame(img);
             canvas.add(img);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -58,7 +44,7 @@ function handleUpload(event) {
 
 function addMainImage() {
     fabric.Image.fromURL(mainImageUrl, function(img) {
-        img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
+        adjustImageToFrame(img);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -80,17 +66,16 @@ function duplicateImage() {
 }
 
 function zoomImage(factor) {
-    canvas.getObjects().forEach(obj => {
-        if (obj !== frame) { // Don't zoom the frame
-            obj.scaleX *= factor;
-            obj.scaleY *= factor;
-            obj.left *= factor;
-            obj.top *= factor;
-            obj.setCoords();
-        }
-    });
-    updateHistory(); // Add state to history
-    canvas.renderAll();
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        activeObject.scaleX *= factor;
+        activeObject.scaleY *= factor;
+        activeObject.left *= factor;
+        activeObject.top *= factor;
+        activeObject.setCoords();
+        updateHistory(); // Add state to history
+        canvas.renderAll();
+    }
 }
 
 function distortImage() {
@@ -167,19 +152,14 @@ function applyCut() {
 function toggleDrawingMode() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
-    if (canvas.isDrawingMode) {
-        canvas.on('path:created', updateHistory); // Add state to history after drawing
-    } else {
-        canvas.off('path:created', updateHistory);
-    }
 }
 
 function undoAction() {
     if (history.length > 1) {
         history.pop();
         const state = history[history.length - 1];
-        canvas.loadFromJSON(state, () => {
-            canvas.renderAll.bind(canvas);
+        canvas.loadFromJSON(state, function() {
+            canvas.renderAll();
             updateLayerManager(); // Update layer manager
         });
     }
@@ -197,7 +177,7 @@ function updateLayerManager() {
     const layerManager = document.getElementById('layerManager');
     layerManager.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
-        if (obj !== frame && obj.type === 'image') {
+        if (obj.type === 'image') {
             const layerItem = document.createElement('div');
             layerItem.className = 'layer-item';
             layerItem.textContent = `Layer ${index}`;
@@ -211,9 +191,21 @@ function updateLayerManager() {
     });
 }
 
+function adjustImageToFrame(img) {
+    const scaleX = frameWidth / img.width;
+    const scaleY = frameHeight / img.height;
+    const scale = Math.min(scaleX, scaleY);
+    img.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: (canvas.width - img.width * scale) / 2,
+        top: (canvas.height - img.height * scale) / 2
+    });
+}
+
 // Add event listeners to capture actions
 canvas.on('object:added', obj => {
-    if (obj.target.type === 'image') {
+    if (obj.target && obj.target.type === 'image') {
         updateHistory();
         updateLayerManager();
     }
