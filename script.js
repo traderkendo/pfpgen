@@ -155,7 +155,7 @@ function applyCut() {
 
 function toggleDrawingMode(mode) {
     if (mode === 'draw') {
-        if (canvas.isDrawingMode) {
+        if (canvas.isDrawingMode && canvas.freeDrawingBrush.color === 'black') {
             canvas.isDrawingMode = false;
             document.getElementById('draw').textContent = 'Draw';
         } else {
