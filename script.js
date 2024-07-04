@@ -18,8 +18,6 @@ document.getElementById('undo').addEventListener('click', undoAction);
 let history = [];
 const maxHistorySize = 30;
 
-let currentLayer = null;
-
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
     const scaleX = frameWidth / img.width;
@@ -36,7 +34,10 @@ function adjustImageToFrame(img) {
 // Load initial image
 fabric.Image.fromURL(mainImageUrl, function(img) {
     adjustImageToFrame(img);
-    addObjectToLayer(img);
+    canvas.add(img);
+    updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
 }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
 function handleUpload(event) {
@@ -46,7 +47,10 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
-            addObjectToLayer(img);
+            canvas.add(img);
+            updateHistory(); // Add state to history
+            updateLayerManager(); // Update layer manager
+            canvas.renderAll();
         });
     };
     reader.readAsDataURL(file);
@@ -55,16 +59,11 @@ function handleUpload(event) {
 function addMainImage() {
     fabric.Image.fromURL(mainImageUrl, function(img) {
         adjustImageToFrame(img);
-        addObjectToLayer(img);
+        canvas.add(img);
+        updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
+        canvas.renderAll();
     }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
-}
-
-function addObjectToLayer(obj) {
-    currentLayer = new fabric.Group([obj], { subTargetCheck: true });
-    canvas.add(currentLayer);
-    updateHistory(); // Add state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
 }
 
 function duplicateImage() {
@@ -72,7 +71,10 @@ function duplicateImage() {
     if (activeObject) {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
-            addObjectToLayer(clone);
+            canvas.add(clone);
+            updateHistory(); // Add state to history
+            updateLayerManager(); // Update layer manager
+            canvas.renderAll();
         });
     }
 }
@@ -91,20 +93,8 @@ function zoomImage(factor) {
 }
 
 function toggleDrawingMode() {
-    if (canvas.isDrawingMode) {
-        canvas.isDrawingMode = false;
-        document.getElementById('draw').textContent = 'Draw';
-        canvas.off('path:created', onPathCreated);
-    } else {
-        canvas.isDrawingMode = true;
-        document.getElementById('draw').textContent = 'Stop Drawing';
-        canvas.on('path:created', onPathCreated);
-    }
-}
-
-function onPathCreated(event) {
-    const path = event.path;
-    addObjectToLayer(path);
+    canvas.isDrawingMode = !canvas.isDrawingMode;
+    document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
 }
 
 function updateBrushColor(event) {
