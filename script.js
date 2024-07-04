@@ -5,7 +5,7 @@ const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/
 fabric.Image.fromURL(mainImageUrl, function(img) {
     img.set({ left: 100, top: 100 });
     canvas.add(img);
-    canvas.renderAll();
+    updateHistory(); // Add initial state to history
 });
 
 document.getElementById('upload').addEventListener('change', handleUpload);
@@ -21,9 +21,6 @@ document.getElementById('undo').addEventListener('click', undoAction);
 let history = [];
 const maxHistorySize = 30;
 
-canvas.on('object:modified', updateHistory);
-canvas.on('object:added', updateHistory);
-
 function handleUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -31,6 +28,7 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             canvas.add(img);
+            updateHistory(); // Add state to history
             canvas.renderAll();
         });
     };
@@ -40,6 +38,7 @@ function handleUpload(event) {
 function addMainImage() {
     fabric.Image.fromURL(mainImageUrl, function(img) {
         canvas.add(img);
+        updateHistory(); // Add state to history
         canvas.renderAll();
     });
 }
@@ -50,6 +49,7 @@ function duplicateImage() {
         const clone = fabric.util.object.clone(activeObject);
         clone.set({ left: clone.left + 10, top: clone.top + 10 });
         canvas.add(clone);
+        updateHistory(); // Add state to history
         canvas.renderAll();
     }
 }
@@ -62,6 +62,7 @@ function zoomImage(factor) {
         obj.top *= factor;
         obj.setCoords();
     });
+    updateHistory(); // Add state to history
     canvas.renderAll();
 }
 
@@ -70,6 +71,7 @@ function distortImage() {
     if (activeObject) {
         activeObject.set('skewX', 20);
         activeObject.set('skewY', 20);
+        updateHistory(); // Add state to history
         canvas.renderAll();
     }
 }
@@ -120,6 +122,7 @@ function finishCut(rect) {
     const activeObject = canvas.getActiveObject();
     if (activeObject) {
         activeObject.set({ clipPath: new fabric.Rect(clipPath) });
+        updateHistory(); // Add state to history
         canvas.renderAll();
     }
 }
@@ -127,6 +130,11 @@ function finishCut(rect) {
 function toggleDrawingMode() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
+    if (canvas.isDrawingMode) {
+        canvas.on('path:created', updateHistory); // Add state to history after drawing
+    } else {
+        canvas.off('path:created', updateHistory);
+    }
 }
 
 function undoAction() {
@@ -144,9 +152,6 @@ function updateHistory() {
         history.shift(); // Remove the oldest state to maintain the max size
     }
 }
-
-canvas.on('object:modified', updateHistory);
-canvas.on('object:added', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
