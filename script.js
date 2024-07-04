@@ -18,6 +18,28 @@ document.getElementById('undo').addEventListener('click', undoAction);
 let history = [];
 const maxHistorySize = 30;
 
+// Function to adjust image to fit the frame
+function adjustImageToFrame(img) {
+    const scaleX = frameWidth / img.width;
+    const scaleY = frameHeight / img.height;
+    const scale = Math.min(scaleX, scaleY);
+    img.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: (canvas.width - img.width * scale) / 2,
+        top: (canvas.height - img.height * scale) / 2
+    });
+}
+
+// Load initial image
+fabric.Image.fromURL(mainImageUrl, function(img) {
+    adjustImageToFrame(img);
+    canvas.add(img);
+    updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
+});
+
 function handleUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -141,6 +163,7 @@ function toggleDrawingMode(mode) {
         canvas.freeDrawingBrush.width = 10;
         canvas.isDrawingMode = true;
         document.getElementById('erase').textContent = 'Stop Erasing';
+        document.getElementById('draw').textContent = 'Draw';
     } else {
         canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
         canvas.freeDrawingBrush.color = 'black';
@@ -186,20 +209,8 @@ function updateLayerManager() {
     });
 }
 
-function adjustImageToFrame(img) {
-    const scaleX = frameWidth / img.width;
-    const scaleY = frameHeight / img.height;
-    const scale = Math.min(scaleX, scaleY);
-    img.set({
-        scaleX: scale,
-        scaleY: scale,
-        left: (canvas.width - img.width * scale) / 2,
-        top: (canvas.height - img.height * scale) / 2
-    });
-}
-
 // Add event listeners to capture actions
-canvas.on('object:added', obj => {
+canvas.on('object:added', function(obj) {
     if (obj.target && obj.target.type === 'image') {
         updateHistory();
         updateLayerManager();
