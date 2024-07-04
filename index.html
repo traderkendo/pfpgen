@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Picture Generator</title>
+    <title>Enhanced Profile Picture Generator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Profile Picture Generator</h1>
-        <div class="profile-picture" id="profilePicture"></div>
-        <input type="text" id="nameInput" placeholder="Enter your name">
-        <button id="generateButton">Generate</button>
+        <h1>Enhanced Profile Picture Generator</h1>
+        <input type="file" id="upload" accept="image/*">
+        <button id="duplicate">Duplicate</button>
+        <button id="removeBackground">Remove Background</button>
+        <button id="zoomIn">Zoom In</button>
+        <button id="zoomOut">Zoom Out</button>
+        <button id="distort">Distort</button>
+        <button id="cut">Cut</button>
+        <button id="draw">Draw</button>
+        <canvas id="canvas" width="500" height="500"></canvas>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pica/5.1.0/pica.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-git add index.html
-git commit -m "Trigger redeployment"
-git push origin main
