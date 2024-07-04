@@ -38,7 +38,7 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
     updateHistory(); // Add initial state to history
     updateLayerManager(); // Update layer manager
     canvas.renderAll();
-});
+}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
 function handleUpload(event) {
     const file = event.target.files[0];
@@ -63,7 +63,7 @@ function addMainImage() {
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
-    });
+    }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 }
 
 function duplicateImage() {
