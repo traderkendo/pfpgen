@@ -6,6 +6,7 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
     img.set({ left: 100, top: 100 });
     canvas.add(img);
     updateHistory(); // Add initial state to history
+    canvas.renderAll();
 });
 
 document.getElementById('upload').addEventListener('change', handleUpload);
@@ -46,11 +47,12 @@ function addMainImage() {
 function duplicateImage() {
     const activeObject = canvas.getActiveObject();
     if (activeObject) {
-        const clone = fabric.util.object.clone(activeObject);
-        clone.set({ left: clone.left + 10, top: clone.top + 10 });
-        canvas.add(clone);
-        updateHistory(); // Add state to history
-        canvas.renderAll();
+        activeObject.clone(function(clone) {
+            clone.set({ left: clone.left + 10, top: clone.top + 10 });
+            canvas.add(clone);
+            updateHistory(); // Add state to history
+            canvas.renderAll();
+        });
     }
 }
 
@@ -77,6 +79,7 @@ function distortImage() {
 }
 
 let isCutting = false;
+let cutRect = null;
 
 function startCut() {
     if (!isCutting) {
@@ -92,7 +95,10 @@ function startCut() {
 }
 
 function initiateCut(event) {
-    const rect = new fabric.Rect({
+    if (cutRect) {
+        canvas.remove(cutRect);
+    }
+    cutRect = new fabric.Rect({
         left: event.pointer.x,
         top: event.pointer.y,
         width: 1,
@@ -101,30 +107,36 @@ function initiateCut(event) {
         stroke: '#000',
         strokeDashArray: [5, 5]
     });
-    canvas.add(rect);
+    canvas.add(cutRect);
     canvas.renderAll();
 
-    canvas.on('mouse:move', function(moveEvent) {
-        rect.set({ width: moveEvent.pointer.x - rect.left, height: moveEvent.pointer.y - rect.top });
-        canvas.renderAll();
-    });
-
-    canvas.on('mouse:up', function() {
-        canvas.off('mouse:move');
-        canvas.off('mouse:up');
-        finishCut(rect);
-    });
+    canvas.on('mouse:move', resizeCutRect);
+    canvas.on('mouse:up', finishCut);
 }
 
-function finishCut(rect) {
-    const clipPath = rect.toObject();
-    canvas.remove(rect);
+function resizeCutRect(event) {
+    if (cutRect) {
+        cutRect.set({ width: event.pointer.x - cutRect.left, height: event.pointer.y - cutRect.top });
+        canvas.renderAll();
+    }
+}
+
+function finishCut() {
+    canvas.off('mouse:move', resizeCutRect);
+    canvas.off('mouse:up', finishCut);
+    applyCut();
+}
+
+function applyCut() {
+    const clipPath = cutRect.toObject();
+    canvas.remove(cutRect);
     const activeObject = canvas.getActiveObject();
     if (activeObject) {
         activeObject.set({ clipPath: new fabric.Rect(clipPath) });
         updateHistory(); // Add state to history
         canvas.renderAll();
     }
+    cutRect = null;
 }
 
 function toggleDrawingMode() {
@@ -152,6 +164,11 @@ function updateHistory() {
         history.shift(); // Remove the oldest state to maintain the max size
     }
 }
+
+// Add event listeners to capture actions
+canvas.on('object:added', updateHistory);
+canvas.on('object:modified', updateHistory);
+canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
