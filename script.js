@@ -23,6 +23,7 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
     img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
     canvas.add(img);
     updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
     canvas.renderAll();
 });
 
@@ -50,6 +51,7 @@ function handleUpload(event) {
             img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
             canvas.add(img);
             updateHistory(); // Add state to history
+            updateLayerManager(); // Update layer manager
             canvas.renderAll();
         });
     };
@@ -61,6 +63,7 @@ function addMainImage() {
         img.set({ left: 50, top: 50, scaleX: frameWidth / img.width, scaleY: frameHeight / img.height });
         canvas.add(img);
         updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     });
 }
@@ -72,6 +75,7 @@ function duplicateImage() {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
             canvas.add(clone);
             updateHistory(); // Add state to history
+            updateLayerManager(); // Update layer manager
             canvas.renderAll();
         });
     }
@@ -88,6 +92,7 @@ function zoomImage(factor) {
         }
     });
     updateHistory(); // Add state to history
+    updateLayerManager(); // Update layer manager
     canvas.renderAll();
 }
 
@@ -97,6 +102,7 @@ function distortImage() {
         activeObject.set('skewX', 20);
         activeObject.set('skewY', 20);
         updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     }
 }
@@ -157,6 +163,7 @@ function applyCut() {
     if (activeObject) {
         activeObject.set({ clipPath: new fabric.Rect(clipPath) });
         updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     }
     cutRect = null;
@@ -166,7 +173,10 @@ function toggleDrawingMode() {
     canvas.isDrawingMode = !canvas.isDrawingMode;
     document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
     if (canvas.isDrawingMode) {
-        canvas.on('path:created', updateHistory); // Add state to history after drawing
+        canvas.on('path:created', () => {
+            updateHistory();
+            updateLayerManager();
+        }); // Add state to history after drawing
     } else {
         canvas.off('path:created', updateHistory);
     }
@@ -176,7 +186,10 @@ function undoAction() {
     if (history.length > 1) {
         history.pop();
         const state = history[history.length - 1];
-        canvas.loadFromJSON(state, canvas.renderAll.bind(canvas));
+        canvas.loadFromJSON(state, () => {
+            canvas.renderAll.bind(canvas);
+            updateLayerManager(); // Update layer manager
+        });
     }
 }
 
@@ -185,6 +198,7 @@ function bringForward() {
     if (activeObject) {
         canvas.bringForward(activeObject);
         updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     }
 }
@@ -194,6 +208,7 @@ function sendBackward() {
     if (activeObject) {
         canvas.sendBackwards(activeObject);
         updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
         canvas.renderAll();
     }
 }
@@ -206,10 +221,58 @@ function updateHistory() {
     }
 }
 
+function updateLayerManager() {
+    const layerManager = document.getElementById('layerManager');
+    layerManager.innerHTML = '';
+    canvas.getObjects().forEach((obj, index) => {
+        if (obj !== frame) {
+            const layerItem = document.createElement('div');
+            layerItem.className = 'layer-item';
+            layerItem.textContent = `Layer ${index}`;
+            layerItem.addEventListener('click', () => {
+                canvas.setActiveObject(obj);
+                canvas.renderAll();
+            });
+
+            const bringForwardButton = document.createElement('button');
+            bringForwardButton.textContent = '↑';
+            bringForwardButton.addEventListener('click', () => {
+                canvas.bringForward(obj);
+                updateHistory(); // Add state to history
+                updateLayerManager(); // Update layer manager
+                canvas.renderAll();
+            });
+
+            const sendBackwardButton = document.createElement('button');
+            sendBackwardButton.textContent = '↓';
+            sendBackwardButton.addEventListener('click', () => {
+                canvas.sendBackwards(obj);
+                updateHistory(); // Add state to history
+                updateLayerManager(); // Update layer manager
+                canvas.renderAll();
+            });
+
+            layerItem.appendChild(bringForwardButton);
+            layerItem.appendChild(sendBackwardButton);
+
+            layerManager.appendChild(layerItem);
+        }
+    });
+}
+
 // Add event listeners to capture actions
-canvas.on('object:added', updateHistory);
-canvas.on('object:modified', updateHistory);
-canvas.on('object:removed', updateHistory);
+canvas.on('object:added', () => {
+    updateHistory();
+    updateLayerManager();
+});
+canvas.on('object:modified', () => {
+    updateHistory();
+    updateLayerManager();
+});
+canvas.on('object:removed', () => {
+    updateHistory();
+    updateLayerManager();
+});
 
 // Initialize history with the initial state
 updateHistory();
