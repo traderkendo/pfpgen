@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Your Bobby</h1>
+        <h1>Your Bobby Generator</h1>
         <input type="file" id="upload" accept="image/*">
         <button id="addImage">Add Image</button>
         <button id="duplicate">Duplicate</button>
@@ -19,13 +19,11 @@
         <label for="sizeChanger">Brush Size: </label>
         <input type="range" id="sizeChanger" min="1" max="50" value="2">
         <button id="undo">Undo</button>
-        <div id="layerManager" class="layer-manager"></div>
+        <div id="layerManager"></div>
         <canvas id="canvas" width="500" height="500"></canvas>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pica/5.1.0/pica.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
