@@ -17,10 +17,7 @@ document.getElementById('undo').addEventListener('click', undoAction);
 
 let history = [];
 const maxHistorySize = 30;
-let lassoPoints = [];
-let lassoPolygon = null;
-let lassoMode = false;
-let isDrawingLasso = false;
+let lassoToolEnabled = false;
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
@@ -97,129 +94,53 @@ function zoomImage(factor) {
 }
 
 function toggleLassoTool() {
-    lassoMode = !lassoMode;
-    if (lassoMode) {
-        canvas.selection = false;
-        canvas.forEachObject(obj => obj.selectable = false);
-        canvas.isDrawingMode = true;
-        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-        canvas.freeDrawingBrush.color = 'rgba(0,0,0,0.3)';
-        canvas.freeDrawingBrush.width = 2;
-        canvas.on('mouse:down', startLasso);
-        document.getElementById('lassoTool').textContent = 'Stop Lasso Tool';
+    lassoToolEnabled = !lassoToolEnabled;
+    if (lassoToolEnabled) {
+        enableLassoTool();
     } else {
-        canvas.selection = true;
-        canvas.forEachObject(obj => obj.selectable = true);
-        canvas.isDrawingMode = false;
-        canvas.off('mouse:down', startLasso);
-        if (lassoPolygon) {
-            canvas.remove(lassoPolygon);
-            lassoPolygon = null;
-        }
-        lassoPoints = [];
-        document.getElementById('lassoTool').textContent = 'Lasso Tool';
+        disableLassoTool();
     }
 }
 
-function startLasso(event) {
-    if (!isDrawingLasso) {
-        isDrawingLasso = true;
-        lassoPoints = [];
-        canvas.on('mouse:move', drawLasso);
-        canvas.on('mouse:up', completeLasso);
-    }
+function enableLassoTool() {
+    const lasso = d3.lasso()
+        .items(d3.selectAll('.fabric-object'))
+        .closePathDistance(100)
+        .closePathSelect(true)
+        .hoverSelect(true)
+        .area(d3.select('canvas'))
+        .on('start', lassoStart)
+        .on('draw', lassoDraw)
+        .on('end', lassoEnd);
+
+    d3.select('canvas').call(lasso);
+
+    document.getElementById('lassoTool').textContent = 'Stop Lasso Tool';
 }
 
-function drawLasso(event) {
-    const pointer = canvas.getPointer(event.e);
-    lassoPoints.push({ x: pointer.x, y: pointer.y });
-
-    if (!lassoPolygon) {
-        lassoPolygon = new fabric.Polygon(lassoPoints, {
-            fill: 'rgba(0,0,0,0.3)',
-            stroke: '#000',
-            strokeWidth: 1,
-            selectable: false,
-            evented: false
-        });
-        canvas.add(lassoPolygon);
-    } else {
-        lassoPolygon.set({ points: lassoPoints });
-    }
-    canvas.renderAll();
-}
-
-function completeLasso() {
-    canvas.off('mouse:move', drawLasso);
-    canvas.off('mouse:up', completeLasso);
-    canvas.isDrawingMode = false;
-    isDrawingLasso = false;
-
-    // Create a selection area from the lasso points
-    const selection = createSelectionFromLasso(lassoPoints);
-    const selectedObjects = canvas.getObjects().filter(obj => isObjectInSelection(obj, selection));
-
-    if (selectedObjects.length > 0) {
-        const group = new fabric.Group(selectedObjects, {
-            left: lassoPolygon.left,
-            top: lassoPolygon.top
-        });
-        canvas.add(group);
-        canvas.setActiveObject(group);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
-    }
-
-    canvas.remove(lassoPolygon);
-    lassoPoints = [];
-    lassoPolygon = null;
-    lassoMode = false;
+function disableLassoTool() {
     document.getElementById('lassoTool').textContent = 'Lasso Tool';
+    // Remove lasso event listeners
+    d3.select('canvas').on('.drag', null);
 }
 
-function createSelectionFromLasso(points) {
-    const selection = {};
-    points.forEach(point => {
-        if (!selection[point.x]) {
-            selection[point.x] = { y1: point.y, y2: point.y };
-        } else {
-            if (point.y < selection[point.x].y1) {
-                selection[point.x].y1 = point.y;
-            }
-            if (point.y > selection[point.x].y2) {
-                selection[point.x].y2 = point.y;
-            }
-        }
+function lassoStart() {
+    console.log('Lasso started');
+}
+
+function lassoDraw() {
+    console.log('Lasso drawing');
+}
+
+function lassoEnd() {
+    const selectedItems = d3.selectAll('.lasso .possible');
+    selectedItems.each(function(d) {
+        const obj = d3.select(this).datum();
+        canvas.remove(canvas.getObjects()[obj.index]);
     });
-    return selection;
-}
-
-function isObjectInSelection(obj, selection) {
-    const objCenter = obj.getCenterPoint();
-    const x = Math.round(objCenter.x);
-    const y = Math.round(objCenter.y);
-    return selection[x] && y >= selection[x].y1 && y <= selection[x].y2;
-}
-
-canvas.on('selection:created', function() {
-    document.addEventListener('keydown', handleKeyDown);
-});
-
-canvas.on('selection:cleared', function() {
-    document.removeEventListener('keydown', handleKeyDown);
-});
-
-function handleKeyDown(event) {
-    if (event.key === 'Delete' || event.key === 'Backspace') {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject) {
-            canvas.remove(activeObject);
-            updateHistory();
-            updateLayerManager();
-            canvas.renderAll();
-        }
-    }
+    updateHistory();
+    updateLayerManager();
+    canvas.renderAll();
 }
 
 function toggleDrawingMode() {
