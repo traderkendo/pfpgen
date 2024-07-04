@@ -18,6 +18,8 @@ document.getElementById('undo').addEventListener('click', undoAction);
 let history = [];
 const maxHistorySize = 30;
 
+let currentLayer = null;
+
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
     const scaleX = frameWidth / img.width;
@@ -34,10 +36,7 @@ function adjustImageToFrame(img) {
 // Load initial image
 fabric.Image.fromURL(mainImageUrl, function(img) {
     adjustImageToFrame(img);
-    canvas.add(img);
-    updateHistory(); // Add initial state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
+    addObjectToLayer(img);
 }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
 function handleUpload(event) {
@@ -47,10 +46,7 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
-            canvas.add(img);
-            updateHistory(); // Add state to history
-            updateLayerManager(); // Update layer manager
-            canvas.renderAll();
+            addObjectToLayer(img);
         });
     };
     reader.readAsDataURL(file);
@@ -59,11 +55,16 @@ function handleUpload(event) {
 function addMainImage() {
     fabric.Image.fromURL(mainImageUrl, function(img) {
         adjustImageToFrame(img);
-        canvas.add(img);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
+        addObjectToLayer(img);
     }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+}
+
+function addObjectToLayer(obj) {
+    currentLayer = new fabric.Group([obj], { subTargetCheck: true });
+    canvas.add(currentLayer);
+    updateHistory(); // Add state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
 }
 
 function duplicateImage() {
@@ -71,10 +72,7 @@ function duplicateImage() {
     if (activeObject) {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
-            canvas.add(clone);
-            updateHistory(); // Add state to history
-            updateLayerManager(); // Update layer manager
-            canvas.renderAll();
+            addObjectToLayer(clone);
         });
     }
 }
@@ -93,8 +91,20 @@ function zoomImage(factor) {
 }
 
 function toggleDrawingMode() {
-    canvas.isDrawingMode = !canvas.isDrawingMode;
-    document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
+    if (canvas.isDrawingMode) {
+        canvas.isDrawingMode = false;
+        document.getElementById('draw').textContent = 'Draw';
+        canvas.off('path:created', onPathCreated);
+    } else {
+        canvas.isDrawingMode = true;
+        document.getElementById('draw').textContent = 'Stop Drawing';
+        canvas.on('path:created', onPathCreated);
+    }
+}
+
+function onPathCreated(event) {
+    const path = event.path;
+    addObjectToLayer(path);
 }
 
 function updateBrushColor(event) {
@@ -130,26 +140,38 @@ function updateLayerManager() {
     const layerManager = document.getElementById('layerManager');
     layerManager.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
-        if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
-            const layerItem = document.createElement('div');
-            layerItem.className = 'layer-item';
-            layerItem.textContent = `Layer ${index}`;
-            layerItem.addEventListener('click', () => {
-                canvas.setActiveObject(obj);
-                canvas.renderAll();
-            });
+        const layerItem = document.createElement('div');
+        layerItem.className = 'layer-item';
+        layerItem.textContent = `Layer ${index}`;
+        layerItem.setAttribute('data-index', index);
+        layerManager.appendChild(layerItem);
+    });
 
-            layerManager.appendChild(layerItem);
+    // Make layers draggable
+    $('#layerManager').sortable({
+        update: function(event, ui) {
+            const newIndex = ui.item.index();
+            const oldIndex = parseInt(ui.item.attr('data-index'), 10);
+            moveLayer(oldIndex, newIndex);
         }
     });
 }
 
+function moveLayer(oldIndex, newIndex) {
+    const objects = canvas.getObjects();
+    const obj = objects.splice(oldIndex, 1)[0];
+    objects.splice(newIndex, 0, obj);
+    canvas.clear();
+    canvas.renderAll();
+    objects.forEach(obj => canvas.add(obj));
+    updateHistory();
+    updateLayerManager();
+}
+
 // Add event listeners to capture actions
-canvas.on('object:added', function(obj) {
-    if (obj.target && (obj.target.type === 'image' || obj.target.type === 'group' || obj.target.type === 'path')) {
-        updateHistory();
-        updateLayerManager();
-    }
+canvas.on('object:added', function() {
+    updateHistory();
+    updateLayerManager();
 });
 canvas.on('object:modified', updateHistory);
 canvas.on('object:removed', updateHistory);
