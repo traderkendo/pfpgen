@@ -19,8 +19,8 @@ let history = [];
 const maxHistorySize = 30;
 let lassoPoints = [];
 let lassoPolygon = null;
-let lassoMode = false;
-let isDrawingLasso = false;
+let lassoMode = true;
+let isDrawingLasso = true;
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
