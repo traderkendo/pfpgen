@@ -154,21 +154,30 @@ function applyCut() {
 }
 
 function toggleDrawingMode(mode) {
-    canvas.isDrawingMode = mode === 'draw';
-    document.getElementById('draw').textContent = canvas.isDrawingMode ? 'Stop Drawing' : 'Draw';
-
-    if (mode === 'erase') {
-        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-        canvas.freeDrawingBrush.color = 'white'; // Assuming the canvas background is white
-        canvas.freeDrawingBrush.width = 10;
-        canvas.isDrawingMode = true;
-        document.getElementById('erase').textContent = 'Stop Erasing';
-        document.getElementById('draw').textContent = 'Draw';
-    } else {
-        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-        canvas.freeDrawingBrush.color = 'black';
-        canvas.freeDrawingBrush.width = 2;
-        document.getElementById('erase').textContent = 'Erase';
+    if (mode === 'draw') {
+        if (canvas.isDrawingMode) {
+            canvas.isDrawingMode = false;
+            document.getElementById('draw').textContent = 'Draw';
+        } else {
+            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+            canvas.freeDrawingBrush.color = 'black';
+            canvas.freeDrawingBrush.width = 2;
+            canvas.isDrawingMode = true;
+            document.getElementById('draw').textContent = 'Stop Drawing';
+            document.getElementById('erase').textContent = 'Erase';
+        }
+    } else if (mode === 'erase') {
+        if (canvas.isDrawingMode && canvas.freeDrawingBrush.color === 'white') {
+            canvas.isDrawingMode = false;
+            document.getElementById('erase').textContent = 'Erase';
+        } else {
+            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+            canvas.freeDrawingBrush.color = 'white'; // Assuming the canvas background is white
+            canvas.freeDrawingBrush.width = 10;
+            canvas.isDrawingMode = true;
+            document.getElementById('erase').textContent = 'Stop Erasing';
+            document.getElementById('draw').textContent = 'Draw';
+        }
     }
 }
 
