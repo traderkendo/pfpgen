@@ -48,8 +48,8 @@ const maxHistorySize = 30;
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
-    const scaleX = frameWidth / img.width;
-    const scaleY = frameHeight / img.height;
+    const scaleX = canvas.width / img.width;
+    const scaleY = canvas.height / img.height;
     const scale = Math.min(scaleX, scaleY);
     img.set({
         scaleX: scale,
@@ -176,7 +176,6 @@ function updateLayerManager() {
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
-        adjustImageToFrame(img);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
