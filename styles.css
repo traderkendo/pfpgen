@@ -16,13 +16,19 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.canvas-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 20px; /* Adjusting margin to move canvas and gallery down */
+}
+
 canvas {
     border: 1px solid #ccc;
-    margin-top: 20px;
     margin-right: 20px;
 }
 
-button, input[type="file"] {
+button, input[type="file"], select {
     margin: 5px;
     padding: 10px 20px;
     border: none;
@@ -32,56 +38,41 @@ button, input[type="file"] {
     cursor: pointer;
 }
 
-button:hover, input[type="file"]:hover {
+button:hover, input[type="file"]:hover, select:hover {
     background-color: #0056b3;
 }
 
-#layerManagerContainer {
-    position: absolute;
-    top: 150px; /* Adjusted to be below the functions */
-    right: 20px; /* Positioned to the right of the canvas */
-    background-color: #fff;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-#layerDropdown {
-    width: 150px;
+#layerManager {
+    width: 200px;
+    margin-top: 20px;
 }
 
 #imageGalleryContainer {
+    text-align: left;
+    max-width: 500px;
     margin-left: 20px;
-    text-align: center;
 }
 
 #imageGallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 10px;
-    margin-bottom: 10px;
 }
 
 #imageGallery img {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
-    object-fit: cover;
 }
 
-#prevPage, #nextPage {
-    margin: 5px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007BFF;
-    color: #fff;
-    cursor: pointer;
+#paginationControls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
 }
 
-#prevPage:hover, #nextPage:hover {
-    background-color: #0056b3;
+#paginationControls button {
+    padding: 5px 10px;
 }
