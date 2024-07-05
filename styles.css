@@ -58,18 +58,3 @@ button:hover, input[type="file"] {
     background-color: #007BFF;
     color: #fff;
 }
-
-.image-button {
-    background: url('https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png') no-repeat center center;
-    background-size: cover;
-    width: 150px;
-    height: 50px;
-    color: transparent; /* Hide the text */
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.image-button:hover {
-    background-color: transparent; /* Ensure the background image remains unchanged */
-}
