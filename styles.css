@@ -31,7 +31,7 @@ button, input[type="file"] {
     cursor: pointer;
 }
 
-button:hover, input[type="file"] {
+button:hover, input[type="file"]:hover {
     background-color: #0056b3;
 }
 
@@ -57,4 +57,23 @@ button:hover, input[type="file"] {
 .layer-item.active {
     background-color: #007BFF;
     color: #fff;
+}
+
+select#imageDropdown {
+    margin-top: 10px;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 4px;
+    width: 250px;
+}
+
+select#imageDropdown option {
+    padding: 10px;
+}
+
+select#imageDropdown option img {
+    width: 50px;
+    height: auto;
+    vertical-align: middle;
+    margin-right: 10px;
 }
