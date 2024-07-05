@@ -1,12 +1,13 @@
 const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
+const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 
 // Define the generator frame dimensions
 const frameWidth = 500;
 const frameHeight = 500;
 
 document.getElementById('upload').addEventListener('change', handleUpload);
-document.getElementById('addImage').addEventListener('click', addMainImage);
+document.getElementById('addBobby').addEventListener('click', addBobbyImage);
 document.getElementById('duplicate').addEventListener('click', duplicateImage);
 document.getElementById('zoomIn').addEventListener('click', () => zoomImage(1.1));
 document.getElementById('zoomOut').addEventListener('click', () => zoomImage(0.9));
@@ -58,8 +59,8 @@ function handleUpload(event) {
     reader.readAsDataURL(file);
 }
 
-function addMainImage() {
-    fabric.Image.fromURL(mainImageUrl, function(img) {
+function addBobbyImage() {
+    fabric.Image.fromURL(bobbyImageUrl, function(img) {
         adjustImageToFrame(img);
         canvas.add(img);
         updateHistory(); // Add state to history
@@ -191,8 +192,7 @@ function populateImageDropdown() {
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/wifhat.png'
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
     ];
 
     imageUrls.forEach(url => {
