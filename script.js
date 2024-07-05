@@ -198,7 +198,7 @@ function populateImageDropdown() {
     imageUrls.forEach(url => {
         const option = document.createElement('option');
         option.value = url;
-        option.textContent = url.split('/').pop(); // Display the file name
+        option.innerHTML = `<img src="${url}" alt="image"> ${url.split('/').pop()}`;
         imageDropdown.appendChild(option);
     });
 }
