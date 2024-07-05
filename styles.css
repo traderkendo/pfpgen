@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
@@ -14,7 +14,10 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-right: 20px;
+}
+
+.toolbar {
+    margin-bottom: 20px;
 }
 
 canvas {
@@ -32,33 +35,39 @@ button, input[type="file"] {
     cursor: pointer;
 }
 
-button:hover, input[type="file"] {
+button:hover, input[type="file"]:hover {
     background-color: #0056b3;
 }
 
-#layerManager {
+#gallery-container {
     margin-top: 20px;
-    width: 100%;
-}
-
-.image-selector {
-    text-align: center;
-}
-
-#imageGallery {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 10px;
-    margin-top: 20px;
+    text-align: left;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #imageGallery img {
-    width: 100%;
+    width: 80px;
+    height: 80px;
+    margin: 5px;
     cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 4px;
 }
 
-#prevPage, #nextPage {
-    margin-top: 20px;
+#imageGallery {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#layerDropdownContainer {
+    position: absolute;
+    top: 160px; /* Adjust this value to place the dropdown in the correct position */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#layerDropdown {
+    width: 200px;
+    height: 150px; /* Adjust height if necessary */
+    margin-top: 10px;
 }
