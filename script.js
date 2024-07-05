@@ -2,9 +2,33 @@ const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 
-// Define the generator frame dimensions
-const frameWidth = 500;
-const frameHeight = 500;
+const imageUrls = [
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
+];
+
+const imagesPerPage = 10;
+let currentPage = 1;
+let totalPages = Math.ceil(imageUrls.length / imagesPerPage);
 
 document.getElementById('upload').addEventListener('change', handleUpload);
 document.getElementById('addBobby').addEventListener('click', addBobbyImage);
@@ -16,7 +40,8 @@ document.getElementById('colorPicker').addEventListener('change', updateBrushCol
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
-document.getElementById('imageDropdown').addEventListener('change', handleImageSelect);
+document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
+document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
 let history = [];
 const maxHistorySize = 30;
@@ -147,8 +172,9 @@ function updateLayerManager() {
     });
 }
 
+// Function to handle image selection
 function handleImageSelect(event) {
-    const selectedImage = event.target.value;
+    const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
         adjustImageToFrame(img);
         canvas.add(img);
@@ -158,56 +184,31 @@ function handleImageSelect(event) {
     }, { crossOrigin: 'anonymous' });
 }
 
-// Function to mirror the selected object horizontally
-function mirrorHorizontal() {
-    const activeObject = canvas.getActiveObject();
-    if (activeObject) {
-        activeObject.set('flipX', !activeObject.flipX);
-        canvas.renderAll();
-        updateHistory(); // Add state to history
+// Function to display images in the gallery
+function displayImages() {
+    const imageGallery = document.getElementById('imageGallery');
+    imageGallery.innerHTML = '';
+    const startIndex = (currentPage - 1) * imagesPerPage;
+    const endIndex = Math.min(startIndex + imagesPerPage, imageUrls.length);
+    for (let i = startIndex; i < endIndex; i++) {
+        const img = document.createElement('img');
+        img.src = imageUrls[i];
+        img.alt = `Image ${i + 1}`;
+        img.addEventListener('click', handleImageSelect);
+        imageGallery.appendChild(img);
     }
 }
 
-// Populate the image dropdown menu with image URLs from the repository
-function populateImageDropdown() {
-    const imageDropdown = document.getElementById('imageDropdown');
-    const imageUrls = [
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
-    ];
-
-    imageUrls.forEach(url => {
-        const option = document.createElement('option');
-        option.value = url;
-        const img = document.createElement('img');
-        img.src = url;
-        img.className = 'image-option';
-        img.style.width = '50px';
-        img.style.height = 'auto';
-        option.appendChild(img);
-        option.appendChild(document.createTextNode(` ${url.split('/').pop()}`));
-        imageDropdown.appendChild(option);
-    });
+// Function to change the page
+function changePage(direction) {
+    currentPage += direction;
+    if (currentPage < 1) currentPage = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    displayImages();
 }
+
+// Populate the image gallery on load
+displayImages();
 
 // Add event listeners to capture actions
 canvas.on('object:added', function(obj) {
@@ -221,4 +222,3 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
-populateImageDropdown(); // Populate the image dropdown on load
