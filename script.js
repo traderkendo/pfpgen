@@ -20,11 +20,11 @@ document.getElementById('randomAccessory').addEventListener('click', addRandomAc
 let history = [];
 const maxHistorySize = 30;
 
-const accessoryUrls = [
-    'https://example.com/path/to/hair.png',
-    'https://example.com/path/to/hat.png',
-    'https://example.com/path/to/glasses.png',
-    'https://example.com/path/to/beard.png'
+const accessoryCreators = [
+    createHair,
+    createHat,
+    createGlasses,
+    createBeard
 ];
 
 // Function to adjust image to fit the frame
@@ -161,14 +161,76 @@ function openAccessoryPage(event) {
 }
 
 function addRandomAccessory() {
-    const randomUrl = accessoryUrls[Math.floor(Math.random() * accessoryUrls.length)];
-    fabric.Image.fromURL(randomUrl, function(img) {
-        img.set({ left: 100, top: 100, selectable: true });
-        canvas.add(img);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
-    }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+    const randomCreator = accessoryCreators[Math.floor(Math.random() * accessoryCreators.length)];
+    randomCreator();
+    updateHistory(); // Add state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
+}
+
+function createHair() {
+    const hair = new fabric.Rect({
+        left: 150,
+        top: 50,
+        fill: 'brown',
+        width: 200,
+        height: 50,
+        selectable: true
+    });
+    canvas.add(hair);
+}
+
+function createHat() {
+    const hat = new fabric.Triangle({
+        left: 150,
+        top: 50,
+        fill: 'black',
+        width: 200,
+        height: 100,
+        selectable: true
+    });
+    canvas.add(hat);
+}
+
+function createGlasses() {
+    const glasses = new fabric.Group([
+        new fabric.Rect({
+            left: 0,
+            top: 0,
+            fill: 'black',
+            width: 50,
+            height: 30
+        }),
+        new fabric.Rect({
+            left: 60,
+            top: 0,
+            fill: 'black',
+            width: 50,
+            height: 30
+        }),
+        new fabric.Rect({
+            left: 50,
+            top: 10,
+            fill: 'black',
+            width: 10,
+            height: 10
+        })
+    ], {
+        left: 150,
+        top: 100,
+        selectable: true
+    });
+    canvas.add(glasses);
+}
+
+function createBeard() {
+    const beard = new fabric.Path('M 0 0 Q 50 100 100 0', {
+        left: 150,
+        top: 200,
+        fill: 'black',
+        selectable: true
+    });
+    canvas.add(beard);
 }
 
 // Add event listeners to capture actions
