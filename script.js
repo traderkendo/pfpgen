@@ -14,18 +14,10 @@ document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
-document.getElementById('randomAccessory').addEventListener('click', addRandomAccessory);
 document.getElementById('imageDropdown').addEventListener('change', handleImageSelect);
 
 let history = [];
 const maxHistorySize = 30;
-
-const accessoryCreators = [
-    createHair,
-    createHat,
-    createGlasses,
-    createBeard
-];
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
@@ -153,79 +145,6 @@ function updateLayerManager() {
     });
 }
 
-function addRandomAccessory() {
-    const randomCreator = accessoryCreators[Math.floor(Math.random() * accessoryCreators.length)];
-    randomCreator();
-    updateHistory(); // Add state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
-}
-
-function createHair() {
-    const hair = new fabric.Rect({
-        left: 150,
-        top: 50,
-        fill: 'brown',
-        width: 200,
-        height: 50,
-        selectable: true
-    });
-    canvas.add(hair);
-}
-
-function createHat() {
-    const hat = new fabric.Triangle({
-        left: 150,
-        top: 50,
-        fill: 'black',
-        width: 200,
-        height: 100,
-        selectable: true
-    });
-    canvas.add(hat);
-}
-
-function createGlasses() {
-    const glasses = new fabric.Group([
-        new fabric.Rect({
-            left: 0,
-            top: 0,
-            fill: 'black',
-            width: 50,
-            height: 30
-        }),
-        new fabric.Rect({
-            left: 60,
-            top: 0,
-            fill: 'black',
-            width: 50,
-            height: 30
-        }),
-        new fabric.Rect({
-            left: 50,
-            top: 10,
-            fill: 'black',
-            width: 10,
-            height: 10
-        })
-    ], {
-        left: 150,
-        top: 100,
-        selectable: true
-    });
-    canvas.add(glasses);
-}
-
-function createBeard() {
-    const beard = new fabric.Path('M 0 0 Q 50 100 100 0', {
-        left: 150,
-        top: 200,
-        fill: 'black',
-        selectable: true
-    });
-    canvas.add(beard);
-}
-
 function handleImageSelect(event) {
     const selectedImage = event.target.value;
     fabric.Image.fromURL(selectedImage, function(img) {
@@ -241,10 +160,27 @@ function handleImageSelect(event) {
 function populateImageDropdown() {
     const imageDropdown = document.getElementById('imageDropdown');
     const imageUrls = [
-        // Add URLs for all images in the images folder
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/image1.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/image2.png',
-        // Add more images as needed
+        'https://github.com/traderkendo/pfpgen/blob/main/images/woodboom.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/axe.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/battonr.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/bbatton.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/boom.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/boom2.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/cannon.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/cannonold.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/cartcannon.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/engbatton.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/gbatton.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/gbatton2.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/oldboom.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/oldcannon.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/opensuitc.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/pbatton.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/pobatton.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/pobatton2.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/stick.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/suitc.png?raw=true',
+        'https://github.com/traderkendo/pfpgen/blob/main/images/woodboom.png?raw=true'
     ];
 
     imageUrls.forEach(url => {
