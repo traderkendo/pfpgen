@@ -130,38 +130,26 @@ function updateLayerManager() {
     const layerManager = document.getElementById('layerManager');
     layerManager.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
-        const layerItem = document.createElement('div');
-        layerItem.className = 'layer-item';
-        layerItem.textContent = `Layer ${index}`;
-        layerItem.setAttribute('data-index', index);
-        layerManager.appendChild(layerItem);
-    });
+        if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
+            const layerItem = document.createElement('div');
+            layerItem.className = 'layer-item';
+            layerItem.textContent = `Layer ${index}`;
+            layerItem.addEventListener('click', () => {
+                canvas.setActiveObject(obj);
+                canvas.renderAll();
+            });
 
-    // Make layers draggable
-    $('#layerManager').sortable({
-        update: function(event, ui) {
-            const newIndex = ui.item.index();
-            const oldIndex = parseInt(ui.item.attr('data-index'), 10);
-            moveLayer(oldIndex, newIndex);
+            layerManager.appendChild(layerItem);
         }
     });
 }
 
-function moveLayer(oldIndex, newIndex) {
-    const objects = canvas.getObjects();
-    const obj = objects.splice(oldIndex, 1)[0];
-    objects.splice(newIndex, 0, obj);
-    canvas.clear();
-    canvas.renderAll();
-    objects.forEach(obj => canvas.add(obj));
-    updateHistory();
-    updateLayerManager();
-}
-
 // Add event listeners to capture actions
-canvas.on('object:added', function() {
-    updateHistory();
-    updateLayerManager();
+canvas.on('object:added', function(obj) {
+    if (obj.target && (obj.target.type === 'image' || obj.target.type === 'group' || obj.target.type === 'path')) {
+        updateHistory();
+        updateLayerManager();
+    }
 });
 canvas.on('object:modified', updateHistory);
 canvas.on('object:removed', updateHistory);
