@@ -38,9 +38,8 @@ button:hover, input[type="file"]:hover {
 
 #layerManagerContainer {
     position: absolute;
-    top: 120px; /* Adjusted to be below the functions */
-    left: 50%;
-    transform: translateX(-50%);
+    top: 150px; /* Adjusted to be below the functions */
+    right: 20px; /* Positioned to the right of the canvas */
     background-color: #fff;
     padding: 10px;
     border: 1px solid #ccc;
