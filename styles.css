@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
@@ -16,13 +16,10 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.toolbar {
-    margin-bottom: 20px;
-}
-
 canvas {
     border: 1px solid #ccc;
     margin-top: 20px;
+    margin-right: 20px;
 }
 
 button, input[type="file"] {
@@ -39,35 +36,53 @@ button:hover, input[type="file"]:hover {
     background-color: #0056b3;
 }
 
-#gallery-container {
-    margin-top: 20px;
-    text-align: left;
-    width: 400px;
-    margin-left: auto;
-    margin-right: auto;
+#layerManagerContainer {
+    position: absolute;
+    top: 120px; /* Adjusted to be below the functions */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
-#imageGallery img {
-    width: 80px;
-    height: 80px;
-    margin: 5px;
-    cursor: pointer;
+#layerDropdown {
+    width: 150px;
+}
+
+#imageGalleryContainer {
+    margin-left: 20px;
+    text-align: center;
 }
 
 #imageGallery {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-#layerDropdownContainer {
-    position: absolute;
-    top: 160px; /* Adjust this value to place the dropdown in the correct position */
-    left: 50%;
-    transform: translateX(-50%);
+#imageGallery img {
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    object-fit: cover;
 }
 
-#layerDropdown {
-    width: 200px;
-    height: 150px; /* Adjust height if necessary */
-    margin-top: 10px;
+#prevPage, #nextPage {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007BFF;
+    color: #fff;
+    cursor: pointer;
+}
+
+#prevPage:hover, #nextPage:hover {
+    background-color: #0056b3;
 }
