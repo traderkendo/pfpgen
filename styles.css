@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
@@ -14,6 +14,11 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-right: 20px;
+}
+
+.canvas-container {
+    display: flex;
 }
 
 canvas {
@@ -59,28 +64,26 @@ button:hover, input[type="file"]:hover {
     color: #fff;
 }
 
-select#imageDropdown {
-    margin-top: 10px;
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 4px;
-    width: 250px;
-    height: auto; /* Ensure height adjusts to content */
-    display: block; /* Ensure block-level display */
-}
-
-select#imageDropdown option {
-    padding: 10px;
-}
-
-.image-option {
+#imageGallery {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 5px;
 }
 
-.image-option img {
-    width: 50px;
+#imageGallery img {
+    width: 100px;
     height: auto;
-    margin-right: 10px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+#paginationControls {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#paginationControls button {
+    margin: 0 5px;
+    padding: 5px 10px;
 }
