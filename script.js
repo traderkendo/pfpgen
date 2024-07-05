@@ -40,6 +40,7 @@ document.getElementById('colorPicker').addEventListener('change', updateBrushCol
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
+document.getElementById('download').addEventListener('click', downloadImage);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
@@ -144,6 +145,22 @@ function undoAction() {
             updateLayerManager(); // Update layer manager
         });
     }
+}
+
+function mirrorHorizontal() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject && activeObject.type === 'image') {
+        activeObject.set('flipX', !activeObject.flipX);
+        updateHistory(); // Add state to history
+        canvas.renderAll();
+    }
+}
+
+function downloadImage() {
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL({ format: 'png' });
+    link.download = 'bobby.png';
+    link.click();
 }
 
 function updateHistory() {
