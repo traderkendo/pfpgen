@@ -160,27 +160,27 @@ function handleImageSelect(event) {
 function populateImageDropdown() {
     const imageDropdown = document.getElementById('imageDropdown');
     const imageUrls = [
-        'https://github.com/traderkendo/pfpgen/blob/main/images/woodboom.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/axe.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/battonr.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/bbatton.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/boom.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/boom2.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/cannon.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/cannonold.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/cartcannon.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/engbatton.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/gbatton.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/gbatton2.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/oldboom.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/oldcannon.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/opensuitc.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/pbatton.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/pobatton.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/pobatton2.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/stick.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/suitc.png?raw=true',
-        'https://github.com/traderkendo/pfpgen/blob/main/images/woodboom.png?raw=true'
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
     ];
 
     imageUrls.forEach(url => {
