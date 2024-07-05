@@ -15,24 +15,27 @@ const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/strawhat.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/wifhat.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blackdiorsnap.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/brownglasses.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cowboyhat.jpg',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/brownglasses-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cowboyhat-removebg-preview.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/curlyhair.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/diorbucket.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/diorsnap.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/eyebrows.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/fendicap.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/smoothbrain-removebg-preview.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/guccicap.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/hathat.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/irishhat.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/mustache.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pinkglasses.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pixelglasses.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blueraygun.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blueyellowgun.jpg',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pinkraygun.jpg',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/monocle-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/hathat-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/irishhat-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/mustache-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pinkglasses-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pixelglasses-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blueraygun-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blueyellowgun-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/happybday-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pinkraygun-removebg-preview.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/BlackBackPack.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Bat.png',	
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/havocbat-removebg-preview.png',	
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png',
@@ -53,7 +56,8 @@ const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/sword-removebg-preview.png'
 ];
 
 const imagesPerPage = 20;
@@ -73,6 +77,18 @@ document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHori
 document.getElementById('download').addEventListener('click', downloadImage);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
+
+// Add event listener for delete key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+        const activeObject = canvas.getActiveObject();
+        if (activeObject) {
+            canvas.remove(activeObject);
+            updateHistory(); // Add state to history
+            updateLayerManager(); // Update layer manager
+        }
+    }
+});
 
 let history = [];
 const maxHistorySize = 30;
