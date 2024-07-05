@@ -14,7 +14,6 @@ document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
-document.getElementById('accessoryDropdown').addEventListener('change', openAccessoryPage);
 document.getElementById('randomAccessory').addEventListener('click', addRandomAccessory);
 
 let history = [];
@@ -151,13 +150,6 @@ function updateLayerManager() {
             layerManager.appendChild(layerItem);
         }
     });
-}
-
-function openAccessoryPage(event) {
-    const url = event.target.value;
-    if (url) {
-        window.open(url, '_blank');
-    }
 }
 
 function addRandomAccessory() {
