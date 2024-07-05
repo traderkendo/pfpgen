@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
@@ -14,16 +14,7 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.toolbar {
-    margin-bottom: 20px;
-}
-
-.canvas-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    margin-right: 20px;
 }
 
 canvas {
@@ -31,7 +22,7 @@ canvas {
     margin-top: 20px;
 }
 
-button, input[type="file"], select {
+button, input[type="file"] {
     margin: 5px;
     padding: 10px 20px;
     border: none;
@@ -41,41 +32,33 @@ button, input[type="file"], select {
     cursor: pointer;
 }
 
-button:hover, input[type="file"]:hover, select:hover {
+button:hover, input[type="file"] {
     background-color: #0056b3;
 }
 
-#layerContainer {
-    text-align: center;
-    margin: 20px 0;
+#layerManager {
+    margin-top: 20px;
+    width: 100%;
 }
 
-#imageGalleryContainer {
-    text-align: left;
-    max-width: 500px;
-    margin-left: 20px;
+.image-selector {
+    text-align: center;
 }
 
 #imageGallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
+    margin-top: 20px;
 }
 
 #imageGallery img {
-    width: 100px;
-    height: 100px;
+    width: 100%;
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-#paginationControls {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-#paginationControls button {
-    padding: 5px 10px;
+#prevPage, #nextPage {
+    margin-top: 20px;
 }
