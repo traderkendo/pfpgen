@@ -3,7 +3,7 @@ const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 
 const imageUrls = [
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI.jpg',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/afropainting.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/afroreal.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/apustaja.png',
@@ -73,18 +73,6 @@ document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHori
 document.getElementById('download').addEventListener('click', downloadImage);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
-
-// Add event listener for delete key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Delete' || event.key === 'Backspace') {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject) {
-            canvas.remove(activeObject);
-            updateHistory(); // Add state to history
-            updateLayerManager(); // Update layer manager
-        }
-    }
-});
 
 let history = [];
 const maxHistorySize = 30;
