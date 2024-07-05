@@ -26,7 +26,7 @@ const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
 ];
 
-const imagesPerPage = 10;
+const imagesPerPage = 20;
 let currentPage = 1;
 let totalPages = Math.ceil(imageUrls.length / imagesPerPage);
 
