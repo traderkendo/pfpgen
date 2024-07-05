@@ -1,10 +1,6 @@
 const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 
-// Define the generator frame dimensions
-const frameWidth = 500;
-const frameHeight = 500;
-
 document.getElementById('upload').addEventListener('change', handleUpload);
 document.getElementById('addImage').addEventListener('click', addMainImage);
 document.getElementById('duplicate').addEventListener('click', duplicateImage);
@@ -15,7 +11,7 @@ document.getElementById('colorPicker').addEventListener('change', updateBrushCol
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
-document.getElementById('download').addEventListener('click', downloadImage);
+document.getElementById('download').addEventListener('click', downloadCanvas);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
@@ -24,6 +20,8 @@ const maxHistorySize = 30;
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
+    const frameWidth = canvas.width;
+    const frameHeight = canvas.height;
     const scaleX = frameWidth / img.width;
     const scaleY = frameHeight / img.height;
     const scale = Math.min(scaleX, scaleY);
@@ -124,17 +122,16 @@ function undoAction() {
 
 function mirrorHorizontal() {
     const activeObject = canvas.getActiveObject();
-    if (activeObject && activeObject.type === 'image') {
+    if (activeObject) {
         activeObject.toggle('flipX');
         canvas.renderAll();
-        updateHistory(); // Add state to history
     }
 }
 
-function downloadImage() {
+function downloadCanvas() {
     const link = document.createElement('a');
-    link.href = canvas.toDataURL({ format: 'png' });
-    link.download = 'your_bobby.png';
+    link.href = canvas.toDataURL('image/png');
+    link.download = 'canvas.png';
     link.click();
 }
 
@@ -150,67 +147,15 @@ function updateLayerManager() {
     const layerDropdown = document.getElementById('layerDropdown');
     layerDropdown.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
-        if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = `Layer ${index}`;
-            layerDropdown.appendChild(option);
-        }
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `Layer ${index}`;
+        layerDropdown.appendChild(option);
     });
-}
-
-let currentPage = 0;
-const itemsPerPage = 20;
-
-const images = [
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png",
-    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png"
-];
-
-function loadImages() {
-    const gallery = document.getElementById('imageGallery');
-    gallery.innerHTML = '';
-    const start = currentPage * itemsPerPage;
-    const end = Math.min(start + itemsPerPage, images.length);
-    for (let i = start; i < end; i++) {
-        const imgElement = document.createElement('img');
-        imgElement.src = images[i];
-        imgElement.alt = `Image ${i}`;
-        imgElement.addEventListener('click', () => addImageToCanvas(images[i]));
-        gallery.appendChild(imgElement);
-    }
-}
-
-function changePage(increment) {
-    currentPage += increment;
-    currentPage = Math.max(0, Math.min(currentPage, Math.floor(images.length / itemsPerPage)));
-    loadImages();
-}
-
-function addImageToCanvas(url) {
-    fabric.Image.fromURL(url, function(img) {
-        canvas.add(img);
-        updateHistory();
-        updateLayerManager();
+    layerDropdown.addEventListener('change', () => {
+        const selectedIndex = layerDropdown.value;
+        const selectedObject = canvas.item(selectedIndex);
+        canvas.setActiveObject(selectedObject);
         canvas.renderAll();
     });
 }
@@ -227,4 +172,65 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
-loadImages();
+
+// Image Gallery
+const imageUrls = [
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
+];
+
+let currentPage = 0;
+const itemsPerPage = 20;
+
+function renderImageGallery() {
+    const gallery = document.getElementById('imageGallery');
+    gallery.innerHTML = '';
+    const start = currentPage * itemsPerPage;
+    const end = start + itemsPerPage;
+    const currentImages = imageUrls.slice(start, end);
+
+    currentImages.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.addEventListener('click', () => {
+            fabric.Image.fromURL(url, function(img) {
+                adjustImageToFrame(img);
+                canvas.add(img);
+                updateHistory(); // Add state to history
+                updateLayerManager(); // Update layer manager
+                canvas.renderAll();
+            });
+        });
+        gallery.appendChild(img);
+    });
+}
+
+function changePage(direction) {
+    currentPage += direction;
+    const totalPages = Math.ceil(imageUrls.length / itemsPerPage);
+    if (currentPage < 0) currentPage = 0;
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    renderImageGallery();
+}
+
+// Initialize the gallery
+renderImageGallery();
