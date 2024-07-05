@@ -1,34 +1,46 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
 }
 
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-    margin-bottom: 20px;
+canvas {
+    border: 1px solid #ccc;
+    margin-top: 20px;
 }
 
-input[type="file"],
-button,
-input[type="color"],
-input[type="range"],
-label {
+button, input[type="file"] {
     margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007BFF;
+    color: #fff;
+    cursor: pointer;
+}
+
+button:hover, input[type="file"] {
+    background-color: #0056b3;
 }
 
 #layerManager {
-    width: 100%;
-    max-width: 500px;
     margin-top: 20px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    list-style: none;
-    background-color: #fff;
+    text-align: left;
+    width: 400px; /* Ensure it matches the canvas/frame width */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .layer-item {
@@ -36,17 +48,13 @@ label {
     justify-content: space-between;
     align-items: center;
     padding: 5px;
+    border: 1px solid #ccc;
     margin-bottom: 5px;
-    background-color: #f0f0f0;
-    cursor: move;
-    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
 }
 
-.layer-item:last-child {
-    margin-bottom: 0;
-}
-
-canvas {
-    border: 1px solid #ccc;
-    margin-top: 20px;
+.layer-item.active {
+    background-color: #007BFF;
+    color: #fff;
 }
