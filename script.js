@@ -14,7 +14,7 @@ document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
-document.getElementById('mirror').addEventListener('click', mirrorHorizontal);
+document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
 document.getElementById('imageDropdown').addEventListener('change', handleImageSelect);
 
 let history = [];
@@ -191,7 +191,8 @@ function populateImageDropdown() {
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/wifhat.png'
     ];
 
     imageUrls.forEach(url => {
