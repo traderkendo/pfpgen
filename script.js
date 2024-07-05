@@ -14,6 +14,7 @@ document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
+document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
 document.getElementById('imageDropdown').addEventListener('change', handleImageSelect);
 
 let history = [];
@@ -156,6 +157,16 @@ function handleImageSelect(event) {
     }, { crossOrigin: 'anonymous' });
 }
 
+// Function to mirror the selected object horizontally
+function mirrorHorizontal() {
+    const activeObject = canvas.getActiveObject();
+    if (activeObject) {
+        activeObject.set('flipX', !activeObject.flipX);
+        canvas.renderAll();
+        updateHistory(); // Add state to history
+    }
+}
+
 // Populate the image dropdown menu with image URLs from the repository
 function populateImageDropdown() {
     const imageDropdown = document.getElementById('imageDropdown');
@@ -180,7 +191,8 @@ function populateImageDropdown() {
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
         'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
-        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/wifhat.png'
     ];
 
     imageUrls.forEach(url => {
