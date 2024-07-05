@@ -90,6 +90,15 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+// Ensure canvas works well with touch events
+canvas.on('touch:gesture', function(event) {
+    if (event.e.touches && event.e.touches.length === 2) {
+        const point = new fabric.Point(event.self.x, event.self.y);
+        const scale = event.self.scale;
+        canvas.zoomToPoint(point, scale);
+    }
+});
+
 let history = [];
 const maxHistorySize = 30;
 
