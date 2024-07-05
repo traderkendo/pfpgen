@@ -15,6 +15,7 @@ document.getElementById('colorPicker').addEventListener('change', updateBrushCol
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('randomAccessory').addEventListener('click', addRandomAccessory);
+document.getElementById('imageDropdown').addEventListener('change', handleImageSelect);
 
 let history = [];
 const maxHistorySize = 30;
@@ -225,6 +226,35 @@ function createBeard() {
     canvas.add(beard);
 }
 
+function handleImageSelect(event) {
+    const selectedImage = event.target.value;
+    fabric.Image.fromURL(selectedImage, function(img) {
+        adjustImageToFrame(img);
+        canvas.add(img);
+        updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
+        canvas.renderAll();
+    }, { crossOrigin: 'anonymous' });
+}
+
+// Populate the image dropdown menu with image URLs from the repository
+function populateImageDropdown() {
+    const imageDropdown = document.getElementById('imageDropdown');
+    const imageUrls = [
+        // Add URLs for all images in the images folder
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/image1.png',
+        'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/image2.png',
+        // Add more images as needed
+    ];
+
+    imageUrls.forEach(url => {
+        const option = document.createElement('option');
+        option.value = url;
+        option.textContent = url.split('/').pop(); // Display the file name
+        imageDropdown.appendChild(option);
+    });
+}
+
 // Add event listeners to capture actions
 canvas.on('object:added', function(obj) {
     if (obj.target && (obj.target.type === 'image' || obj.target.type === 'group' || obj.target.type === 'path')) {
@@ -237,3 +267,4 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
+populateImageDropdown(); // Populate the image dropdown on load
