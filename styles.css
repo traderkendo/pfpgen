@@ -16,6 +16,10 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.toolbar {
+    margin-bottom: 20px;
+}
+
 .canvas-container {
     display: flex;
     justify-content: space-between;
@@ -41,8 +45,8 @@ button:hover, input[type="file"]:hover, select:hover {
     background-color: #0056b3;
 }
 
-#layerManager {
-    width: 200px;
+#layerContainer {
+    text-align: center;
     margin: 20px 0;
 }
 
