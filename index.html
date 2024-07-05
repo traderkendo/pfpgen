@@ -10,7 +10,7 @@
     <div class="container">
         <h1>Your Bobby</h1>
         <input type="file" id="upload" accept="image/*">
-        <button id="addImage">Add $Bobby</button>
+        <button id="addBobby">Add $Bobby</button>
         <button id="duplicate">Duplicate</button>
         <button id="zoomIn">Zoom In</button>
         <button id="zoomOut">Zoom Out</button>
@@ -22,15 +22,17 @@
         <button id="mirrorHorizontal">Mirror Horizontal</button>
         <button id="download">Download</button>
     </div>
-    <canvas id="canvas" width="500" height="500"></canvas>
-    <div id="layerManagerContainer">
-        <select id="layerDropdown" size="5"></select>
-    </div>
-    <div id="imageGalleryContainer">
-        <h2>Select Images</h2>
-        <div id="imageGallery"></div>
-        <button id="prevPage">Previous</button>
-        <button id="nextPage">Next</button>
+    <select id="layerManager" size="5"></select>
+    <div class="canvas-container">
+        <canvas id="canvas" width="500" height="500"></canvas>
+        <div id="imageGalleryContainer">
+            <h2>Select Images</h2>
+            <div id="imageGallery"></div>
+            <div id="paginationControls">
+                <button id="prevPage">Previous</button>
+                <button id="nextPage">Next</button>
+            </div>
+        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pica/5.1.0/pica.min.js"></script>
