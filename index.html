@@ -9,29 +9,34 @@
 <body>
     <div class="container">
         <h1>Your Bobby</h1>
-        <input type="file" id="upload" accept="image/*">
-        <button id="addBobby">Add $Bobby</button>
-        <button id="duplicate">Duplicate</button>
-        <button id="zoomIn">Zoom In</button>
-        <button id="zoomOut">Zoom Out</button>
-        <button id="draw">Draw</button>
-        <input type="color" id="colorPicker" value="#000000">
-        <label for="sizeChanger">Brush Size: </label>
-        <input type="range" id="sizeChanger" min="1" max="50" value="2">
-        <button id="undo">Undo</button>
-        <button id="mirrorHorizontal">Mirror Horizontal</button>
-        <button id="download">Download</button>
-        <select id="layerManager" size="5"></select>
+        <div class="toolbar">
+            <input type="file" id="upload" accept="image/*">
+            <button id="addImage">Add $Bobby</button>
+            <button id="duplicate">Duplicate</button>
+            <button id="zoomIn">Zoom In</button>
+            <button id="zoomOut">Zoom Out</button>
+            <button id="draw">Draw</button>
+            <input type="color" id="colorPicker" value="#000000">
+            <label for="sizeChanger">Brush Size: </label>
+            <input type="range" id="sizeChanger" min="1" max="50" value="2">
+            <button id="undo">Undo</button>
+            <button id="mirrorHorizontal">Mirror Horizontal</button>
+            <button id="download">Download</button>
+        </div>
         <div class="canvas-container">
             <canvas id="canvas" width="500" height="500"></canvas>
             <div id="imageGalleryContainer">
                 <h2>Select Images</h2>
                 <div id="imageGallery"></div>
                 <div id="paginationControls">
-                    <button id="prevPage">Previous</button>
-                    <button id="nextPage">Next</button>
+                    <button onclick="changePage(-1)">Previous</button>
+                    <button onclick="changePage(1)">Next</button>
                 </div>
             </div>
+        </div>
+        <div id="layerContainer">
+            <label for="layerManager">Layers</label>
+            <select id="layerManager" size="10"></select>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
