@@ -15,9 +15,17 @@ document.getElementById('colorPicker').addEventListener('change', updateBrushCol
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('accessoryDropdown').addEventListener('change', openAccessoryPage);
+document.getElementById('randomAccessory').addEventListener('click', addRandomAccessory);
 
 let history = [];
 const maxHistorySize = 30;
+
+const accessoryUrls = [
+    'https://example.com/path/to/hair.png',
+    'https://example.com/path/to/hat.png',
+    'https://example.com/path/to/glasses.png',
+    'https://example.com/path/to/beard.png'
+];
 
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
@@ -150,6 +158,17 @@ function openAccessoryPage(event) {
     if (url) {
         window.open(url, '_blank');
     }
+}
+
+function addRandomAccessory() {
+    const randomUrl = accessoryUrls[Math.floor(Math.random() * accessoryUrls.length)];
+    fabric.Image.fromURL(randomUrl, function(img) {
+        img.set({ left: 100, top: 100, selectable: true });
+        canvas.add(img);
+        updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
+        canvas.renderAll();
+    }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 }
 
 // Add event listeners to capture actions
