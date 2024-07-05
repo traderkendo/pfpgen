@@ -14,8 +14,10 @@ document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
-document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
+document.getElementById('mirror').addEventListener('click', mirrorImage);
 document.getElementById('download').addEventListener('click', downloadImage);
+document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
+document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
 let history = [];
 const maxHistorySize = 30;
@@ -120,19 +122,20 @@ function undoAction() {
     }
 }
 
-function mirrorHorizontal() {
+function mirrorImage() {
     const activeObject = canvas.getActiveObject();
-    if (activeObject && activeObject.type === 'image') {
-        activeObject.set('flipX', !activeObject.flipX);
-        updateHistory(); // Add state to history
+    if (activeObject) {
+        activeObject.toggle('flipX');
+        activeObject.setCoords();
         canvas.renderAll();
+        updateHistory(); // Add state to history
     }
 }
 
 function downloadImage() {
     const link = document.createElement('a');
     link.href = canvas.toDataURL({ format: 'png' });
-    link.download = 'bobby.png';
+    link.download = 'your_bobby.png';
     link.click();
 }
 
@@ -151,7 +154,6 @@ function updateLayerManager() {
         if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
             const layerItem = document.createElement('option');
             layerItem.textContent = `Layer ${index}`;
-            layerItem.value = index;
             layerItem.addEventListener('click', () => {
                 canvas.setActiveObject(obj);
                 canvas.renderAll();
@@ -161,6 +163,66 @@ function updateLayerManager() {
         }
     });
 }
+
+function loadGalleryImages(page) {
+    const gallery = document.getElementById('imageGallery');
+    gallery.innerHTML = '';
+
+    const imagesPerPage = 20;
+    const startIndex = page * imagesPerPage;
+    const endIndex = Math.min(startIndex + imagesPerPage, imageUrls.length);
+    for (let i = startIndex; i < endIndex; i++) {
+        const imgElement = document.createElement('img');
+        imgElement.src = imageUrls[i];
+        imgElement.addEventListener('click', () => addImageToCanvas(imageUrls[i]));
+        gallery.appendChild(imgElement);
+    }
+}
+
+let currentPage = 0;
+const imageUrls = [
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png",
+    "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png"
+];
+
+function changePage(direction) {
+    currentPage += direction;
+    const totalPages = Math.ceil(imageUrls.length / 20);
+    if (currentPage < 0) currentPage = 0;
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    loadGalleryImages(currentPage);
+}
+
+function addImageToCanvas(url) {
+    fabric.Image.fromURL(url, function(img) {
+        canvas.add(img);
+        updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
+        canvas.renderAll();
+    });
+}
+
+// Initial load of the gallery images
+loadGalleryImages(currentPage);
 
 // Add event listeners to capture actions
 canvas.on('object:added', function(obj) {
@@ -174,69 +236,3 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
-
-const imageUrls = [
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
-    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png'
-];
-
-let currentPage = 0;
-const imagesPerPage = 20;
-
-function showPage(page) {
-    const start = page * imagesPerPage;
-    const end = start + imagesPerPage;
-    const imagesToShow = imageUrls.slice(start, end);
-
-    const imageGallery = document.getElementById('imageGallery');
-    imageGallery.innerHTML = '';
-
-    imagesToShow.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = url.split('/').pop();
-        img.addEventListener('click', () => addImageFromUrl(url));
-        imageGallery.appendChild(img);
-    });
-
-    currentPage = page;
-}
-
-function changePage(increment) {
-    const newPage = currentPage + increment;
-    if (newPage >= 0 && newPage < Math.ceil(imageUrls.length / imagesPerPage)) {
-        showPage(newPage);
-    }
-}
-
-function addImageFromUrl(url) {
-    fabric.Image.fromURL(url, function(img) {
-        adjustImageToFrame(img);
-        canvas.add(img);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
-    }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
-}
-
-// Initial page load
-showPage(currentPage);
