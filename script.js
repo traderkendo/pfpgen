@@ -74,6 +74,18 @@ document.getElementById('download').addEventListener('click', downloadImage);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
+// Add event listener for delete key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+        const activeObject = canvas.getActiveObject();
+        if (activeObject) {
+            canvas.remove(activeObject);
+            updateHistory(); // Add state to history
+            updateLayerManager(); // Update layer manager
+        }
+    }
+});
+
 let history = [];
 const maxHistorySize = 30;
 
