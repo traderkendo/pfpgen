@@ -65,15 +65,22 @@ select#imageDropdown {
     padding: 10px;
     border-radius: 4px;
     width: 250px;
+    height: auto; /* Ensure height adjusts to content */
+    display: block; /* Ensure block-level display */
 }
 
 select#imageDropdown option {
     padding: 10px;
 }
 
-select#imageDropdown option img {
+.image-option {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.image-option img {
     width: 50px;
     height: auto;
-    vertical-align: middle;
     margin-right: 10px;
 }
