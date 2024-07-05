@@ -147,7 +147,9 @@ function updateLayerManager() {
 
 function openAccessoryPage(event) {
     const url = event.target.value;
-    window.open(url, '_blank');
+    if (url) {
+        window.open(url, '_blank');
+    }
 }
 
 // Add event listeners to capture actions
