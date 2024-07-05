@@ -198,7 +198,13 @@ function populateImageDropdown() {
     imageUrls.forEach(url => {
         const option = document.createElement('option');
         option.value = url;
-        option.innerHTML = `<img src="${url}" alt="image"> ${url.split('/').pop()}`;
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'image-option';
+        img.style.width = '50px';
+        img.style.height = 'auto';
+        option.appendChild(img);
+        option.appendChild(document.createTextNode(` ${url.split('/').pop()}`));
         imageDropdown.appendChild(option);
     });
 }
