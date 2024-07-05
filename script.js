@@ -14,7 +14,7 @@ document.getElementById('draw').addEventListener('click', toggleDrawingMode);
 document.getElementById('colorPicker').addEventListener('change', updateBrushColor);
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
-document.getElementById('mirror').addEventListener('click', mirrorImage);
+document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
 document.getElementById('download').addEventListener('click', downloadImage);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
@@ -61,7 +61,7 @@ function handleUpload(event) {
 }
 
 function addMainImage() {
-    fabric.Image.fromURL('https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png', function(img) {
+    fabric.Image.fromURL(mainImageUrl, function(img) {
         adjustImageToFrame(img);
         canvas.add(img);
         updateHistory(); // Add state to history
@@ -122,11 +122,10 @@ function undoAction() {
     }
 }
 
-function mirrorImage() {
+function mirrorHorizontal() {
     const activeObject = canvas.getActiveObject();
-    if (activeObject) {
+    if (activeObject && activeObject.type === 'image') {
         activeObject.toggle('flipX');
-        activeObject.setCoords();
         canvas.renderAll();
         updateHistory(); // Add state to history
     }
@@ -148,39 +147,22 @@ function updateHistory() {
 }
 
 function updateLayerManager() {
-    const layerManager = document.getElementById('layerManager');
-    layerManager.innerHTML = '';
+    const layerDropdown = document.getElementById('layerDropdown');
+    layerDropdown.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
         if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
-            const layerItem = document.createElement('option');
-            layerItem.textContent = `Layer ${index}`;
-            layerItem.addEventListener('click', () => {
-                canvas.setActiveObject(obj);
-                canvas.renderAll();
-            });
-
-            layerManager.appendChild(layerItem);
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = `Layer ${index}`;
+            layerDropdown.appendChild(option);
         }
     });
 }
 
-function loadGalleryImages(page) {
-    const gallery = document.getElementById('imageGallery');
-    gallery.innerHTML = '';
-
-    const imagesPerPage = 20;
-    const startIndex = page * imagesPerPage;
-    const endIndex = Math.min(startIndex + imagesPerPage, imageUrls.length);
-    for (let i = startIndex; i < endIndex; i++) {
-        const imgElement = document.createElement('img');
-        imgElement.src = imageUrls[i];
-        imgElement.addEventListener('click', () => addImageToCanvas(imageUrls[i]));
-        gallery.appendChild(imgElement);
-    }
-}
-
 let currentPage = 0;
-const imageUrls = [
+const itemsPerPage = 20;
+
+const images = [
     "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png",
     "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png",
     "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png",
@@ -204,25 +186,34 @@ const imageUrls = [
     "https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png"
 ];
 
-function changePage(direction) {
-    currentPage += direction;
-    const totalPages = Math.ceil(imageUrls.length / 20);
-    if (currentPage < 0) currentPage = 0;
-    if (currentPage >= totalPages) currentPage = totalPages - 1;
-    loadGalleryImages(currentPage);
+function loadImages() {
+    const gallery = document.getElementById('imageGallery');
+    gallery.innerHTML = '';
+    const start = currentPage * itemsPerPage;
+    const end = Math.min(start + itemsPerPage, images.length);
+    for (let i = start; i < end; i++) {
+        const imgElement = document.createElement('img');
+        imgElement.src = images[i];
+        imgElement.alt = `Image ${i}`;
+        imgElement.addEventListener('click', () => addImageToCanvas(images[i]));
+        gallery.appendChild(imgElement);
+    }
+}
+
+function changePage(increment) {
+    currentPage += increment;
+    currentPage = Math.max(0, Math.min(currentPage, Math.floor(images.length / itemsPerPage)));
+    loadImages();
 }
 
 function addImageToCanvas(url) {
     fabric.Image.fromURL(url, function(img) {
         canvas.add(img);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
+        updateHistory();
+        updateLayerManager();
         canvas.renderAll();
     });
 }
-
-// Initial load of the gallery images
-loadGalleryImages(currentPage);
 
 // Add event listeners to capture actions
 canvas.on('object:added', function(obj) {
@@ -236,3 +227,4 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
+loadImages();
