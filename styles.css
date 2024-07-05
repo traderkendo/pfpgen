@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
@@ -14,11 +14,12 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-right: 20px;
 }
 
 .canvas-container {
     display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 canvas {
@@ -26,7 +27,7 @@ canvas {
     margin-top: 20px;
 }
 
-button, input[type="file"] {
+button, input[type="file"], select {
     margin: 5px;
     padding: 10px 20px;
     border: none;
@@ -36,60 +37,41 @@ button, input[type="file"] {
     cursor: pointer;
 }
 
-button:hover, input[type="file"]:hover {
+button:hover, input[type="file"]:hover, select:hover {
     background-color: #0056b3;
 }
 
 #layerManager {
-    margin-top: 20px;
-    text-align: left;
-    width: 400px; /* Ensure it matches the canvas/frame width */
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.layer-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px;
-    border: 1px solid #ccc;
-    margin-bottom: 5px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-.layer-item.active {
-    background-color: #007BFF;
-    color: #fff;
+    width: 200px;
+    margin: 20px 0;
 }
 
 #imageGalleryContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: left;
+    max-width: 500px;
+    margin-left: 20px;
 }
 
 #imageGallery {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-top: 10px;
 }
 
 #imageGallery img {
     width: 100px;
-    height: auto;
+    height: 100px;
     cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 #paginationControls {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     margin-top: 10px;
 }
 
 #paginationControls button {
-    margin: 0 5px;
     padding: 5px 10px;
 }
