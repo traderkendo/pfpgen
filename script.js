@@ -193,6 +193,7 @@ function updateLayerManager() {
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
+        img.moveTo(canvas.getObjects().length - 1);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
