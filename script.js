@@ -176,9 +176,9 @@ function updateLayerManager() {
     layerManager.innerHTML = '';
     canvas.getObjects().forEach((obj, index) => {
         if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
-            const layerItem = document.createElement('div');
-            layerItem.className = 'layer-item';
+            const layerItem = document.createElement('option');
             layerItem.textContent = `Layer ${index}`;
+            layerItem.value = index;
             layerItem.addEventListener('click', () => {
                 canvas.setActiveObject(obj);
                 canvas.renderAll();
