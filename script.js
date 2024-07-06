@@ -109,6 +109,10 @@ function adjustImageToFrame(img) {
 // Load initial image
 fabric.Image.fromURL(mainImageUrl, function(img) {
     adjustImageToFrame(img);
+    img.set({
+        selectable: false,  // Make the main image static
+        evented: false      // Optional: Prevent any interaction with the main image
+    });
     canvas.add(img);
     updateHistory(); // Add initial state to history
     updateLayerManager(); // Update layer manager
