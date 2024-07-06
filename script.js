@@ -239,6 +239,27 @@ function updateLayerManager() {
     });
 }
 
+new Sortable(layerManager, {
+        onEnd: function (/**Event*/evt) {
+            const oldIndex = evt.oldIndex;
+            const newIndex = evt.newIndex;
+            const movedObject = objects[oldIndex];
+
+            objects.splice(oldIndex, 1); // Remove from old position
+            objects.splice(newIndex, 0, movedObject); // Insert in new position
+
+            canvas.clear();
+            objects.forEach((obj) => {
+                canvas.add(obj);
+            });
+            canvas.renderAll();
+            updateHistory();
+        }
+    });
+}
+
+// Call updateLayerManager after initializing the canvas or adding new objects
+updateLayerManager();
 // Function to handle image selection
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
