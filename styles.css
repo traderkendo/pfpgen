@@ -3,7 +3,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Changed from height to min-height */
+    height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
 }
@@ -14,20 +14,17 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 100%; /* Ensure it doesn't overflow the screen */
 }
 
 .canvas-container {
     display: flex;
-    flex-direction: column; /* Stack elements vertically on small screens */
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 canvas {
     border: 1px solid #ccc;
     margin-top: 20px;
-    max-width: 100%; /* Ensure the canvas resizes properly */
 }
 
 button, input[type="file"], select {
@@ -38,8 +35,6 @@ button, input[type="file"], select {
     background-color: #007BFF;
     color: #fff;
     cursor: pointer;
-    width: 100%; /* Full width for better touch interaction */
-    box-sizing: border-box;
 }
 
 button:hover, input[type="file"]:hover, select:hover {
@@ -47,26 +42,25 @@ button:hover, input[type="file"]:hover, select:hover {
 }
 
 #layerManager {
-    width: 100%; /* Full width for better touch interaction */
+    width: 200px;
     margin: 20px 0;
 }
 
 #imageGalleryContainer {
     text-align: left;
-    width: 100%; /* Ensure it resizes properly */
-    margin-top: 20px;
+    max-width: 500px;
+    margin-left: 20px;
 }
 
 #imageGallery {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    justify-content: center; /* Center images */
 }
 
 #imageGallery img {
-    width: 80px; /* Smaller images for mobile */
-    height: 80px;
+    width: 100px;
+    height: 100px;
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -80,21 +74,4 @@ button:hover, input[type="file"]:hover, select:hover {
 
 #paginationControls button {
     padding: 5px 10px;
-    flex: 1; /* Ensure buttons are evenly spaced */
-    margin: 0 5px;
-}
-
-@media (min-width: 768px) {
-    .canvas-container {
-        flex-direction: row; /* Row layout for larger screens */
-    }
-
-    #layerManager {
-        width: 200px;
-    }
-
-    #imageGallery img {
-        width: 100px;
-        height: 100px;
-    }
 }
