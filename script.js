@@ -221,25 +221,24 @@ function updateHistory() {
     }
 }
 
+// Ensure that Sortable.js is included in your project
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+
 function updateLayerManager() {
     const layerManager = document.getElementById('layerManager');
     layerManager.innerHTML = '';
-    canvas.getObjects().forEach((obj, index) => {
+    const objects = canvas.getObjects();
+
+    objects.forEach((obj, index) => {
         if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
             const layerItem = document.createElement('option');
             layerItem.textContent = `Layer ${index}`;
             layerItem.value = index;
-            layerItem.addEventListener('click', () => {
-                canvas.setActiveObject(obj);
-                canvas.renderAll();
-            });
-
             layerManager.appendChild(layerItem);
         }
     });
-}
 
-new Sortable(layerManager, {
+    new Sortable(layerManager, {
         onEnd: function (/**Event*/evt) {
             const oldIndex = evt.oldIndex;
             const newIndex = evt.newIndex;
@@ -257,6 +256,10 @@ new Sortable(layerManager, {
         }
     });
 }
+
+// Call updateLayerManager after initializing the canvas or adding new objects
+updateLayerManager();
+
 
 // Call updateLayerManager after initializing the canvas or adding new objects
 updateLayerManager();
