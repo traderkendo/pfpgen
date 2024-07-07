@@ -208,8 +208,16 @@ function mirrorHorizontal() {
 }
 
 function downloadImage() {
+    if (canvas.getObjects().length === 0) {
+        console.error("Canvas is empty. Please add an image before downloading.");
+        return;
+    }
+    
+    const dataURL = canvas.toDataURL({ format: 'png' });
+    console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
+
     const link = document.createElement('a');
-    link.href = canvas.toDataURL({ format: 'png' });
+    link.href = dataURL;
     link.download = 'bobby.png';
     link.click();
 }
