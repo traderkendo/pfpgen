@@ -148,6 +148,16 @@ function addBobbyImage() {
     }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 }
 
+function addBobbyHeadImage() {
+    fabric.Image.fromURL(bobbyHeadImageUrl, function(img) {
+        adjustImageToFrame(img);
+        canvas.add(img);
+        updateHistory(); // Add state to history
+        updateLayerManager(); // Update layer manager
+        canvas.renderAll();
+    }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+}
+
 function duplicateImage() {
     const activeObject = canvas.getActiveObject();
     if (activeObject) {
