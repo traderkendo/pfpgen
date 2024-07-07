@@ -332,4 +332,17 @@ canvas.on('object:modified', updateHistory);
 canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
-updateHistory();
+updateHistory(); 
+
+// Load the initial main image on the canvas
+fabric.Image.fromURL(mainImageUrl, function(img) {
+    adjustImageToFrame(img);
+    img.set({
+        selectable: false,  // Make the main image static
+        evented: false      // Prevent any interaction with the main image
+    });
+    canvas.add(img);
+    updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
+}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
