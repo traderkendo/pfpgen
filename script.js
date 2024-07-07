@@ -1,6 +1,7 @@
 const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
+const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
 
 const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
@@ -66,6 +67,7 @@ let totalPages = Math.ceil(imageUrls.length / imagesPerPage);
 
 document.getElementById('upload').addEventListener('change', handleUpload);
 document.getElementById('addBobby').addEventListener('click', addBobbyImage);
+document.getElementById('addBobbyHead').addEventListener('click', addBobbyHeadImage);
 document.getElementById('duplicate').addEventListener('click', duplicateImage);
 document.getElementById('zoomIn').addEventListener('click', () => zoomImage(1.1));
 document.getElementById('zoomOut').addEventListener('click', () => zoomImage(0.9));
