@@ -3,7 +3,61 @@ const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 
 const imageUrls = [
-    // Your image URLs here
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/afropainting.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/afroreal.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/apustaja.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blackcurly.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blackcurly2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/goku.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/ssj.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/ssgod.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/strawhat.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/wifhat.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blackdiorsnap.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/brownglasses-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cowboyhat-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/curlyhair.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/diorbucket.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/diorsnap.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/eyebrows.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/fendicap.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/smoothbrain-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/guccicap.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/monocle-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/hathat-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/irishhat-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/mustache-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pinkglasses-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pixelglasses-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blueraygun-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/blueyellowgun-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/happybday-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pinkraygun-removebg-preview.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/BlackBackPack.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/havocbat-removebg-preview.png',    
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/Axe%20G.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/axe.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/battonr.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/boom2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cannonold.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/cartcannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/engbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/gbatton2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldboom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/oldcannon.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/opensuitc.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pbatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pobatton2.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/stick.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/suitc.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/woodboom.png',
+    'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/sword-removebg-preview.png'
 ];
 
 const imagesPerPage = 20;
@@ -171,9 +225,7 @@ function updateHistory() {
 function updateLayerManager() {
     const layerManager = document.getElementById('layerManager');
     layerManager.innerHTML = '';
-    const objects = canvas.getObjects();
-
-    objects.forEach((obj, index) => {
+    canvas.getObjects().forEach((obj, index) => {
         if (obj.type === 'image' || obj.type === 'group' || obj.type === 'polygon') {
             const layerItem = document.createElement('option');
             layerItem.textContent = `Layer ${index}`;
@@ -182,18 +234,21 @@ function updateLayerManager() {
                 canvas.setActiveObject(obj);
                 canvas.renderAll();
             });
+
             layerManager.appendChild(layerItem);
         }
     });
 
-    // Make the layerManager sortable
+    // Make the layer manager sortable
     new Sortable(layerManager, {
-        onEnd: function (evt) {
+        onEnd: function(evt) {
             const oldIndex = evt.oldIndex;
             const newIndex = evt.newIndex;
-            const movedObject = objects[oldIndex];
 
-            // Reorder the objects array
+            if (oldIndex === newIndex) return;
+
+            const objects = canvas.getObjects();
+            const movedObject = objects[oldIndex];
             objects.splice(oldIndex, 1);
             objects.splice(newIndex, 0, movedObject);
 
