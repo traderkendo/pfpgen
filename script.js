@@ -4,8 +4,6 @@ const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main
 const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
 const watermarkImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png'; // URL for the watermark image
 
-let watermark; // Variable to store the watermark object
-
 const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/afropainting.png',
@@ -164,6 +162,19 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
     canvas.renderAll();
 }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
+// Load watermark image
+fabric.Image.fromURL(watermarkImageUrl, function(img) {
+    img.set({
+        selectable: false,  // Make the watermark static
+        evented: false,     // Prevent any interaction with the watermark
+        top: 10,            // Position the watermark
+        left: 10,
+        opacity: 0.5        // Set opacity to make it look like a watermark
+    });
+    canvas.add(img);
+    canvas.renderAll();
+}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+
 function handleUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -171,6 +182,7 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
+            img.moveTo(canvas.getObjects().length - 1);
             canvas.add(img);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -183,6 +195,7 @@ function handleUpload(event) {
 function addBobbyImage() {
     fabric.Image.fromURL(bobbyImageUrl, function(img) {
         adjustImageToFrame(img);
+        img.moveTo(canvas.getObjects().length - 1);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -193,6 +206,7 @@ function addBobbyImage() {
 function addBobbyHeadImage() {
     fabric.Image.fromURL(bobbyHeadImageUrl, function(img) {
         adjustImageToFrame(img);
+        img.moveTo(canvas.getObjects().length - 1);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -205,6 +219,7 @@ function duplicateImage() {
     if (activeObject) {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
+            clone.moveTo(canvas.getObjects().length - 1);
             canvas.add(clone);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -249,43 +264,77 @@ function setBrush(type) {
         case 'spray':
             canvas.freeDrawingBrush = new fabric.SprayBrush(canvas);
             break;
+        case 'pattern':
+            const img = new Image();
+            img.src = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pixelpattern.png';
+            img.onload = function() {
+                const patternBrush = new fabric.PatternBrush(canvas);
+                patternBrush.source = img;
+                canvas.freeDrawingBrush = patternBrush;
+            };
+            break;
         case 'circle':
             const circleBrush = new fabric.CircleBrush(canvas);
             circleBrush.width = canvas.freeDrawingBrush.width;
-            circleBrush.color = canvas.freeDrawingBrush.color;
             canvas.freeDrawingBrush = circleBrush;
             break;
         case 'hline':
-            const hLineBrush = new fabric.HLineBrush(canvas);
-            hLineBrush.width = canvas.freeDrawingBrush.width;
-            hLineBrush.color = canvas.freeDrawingBrush.color;
-            canvas.freeDrawingBrush = hLineBrush;
+            const hlineBrush = new fabric.PatternBrush(canvas);
+            hlineBrush.getPatternSrc = function() {
+                const patternCanvas = fabric.document.createElement('canvas');
+                patternCanvas.width = patternCanvas.height = 10;
+                const ctx = patternCanvas.getContext('2d');
+                ctx.strokeStyle = canvas.freeDrawingBrush.color;
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(0, 5);
+                ctx.lineTo(10, 5);
+                ctx.closePath();
+                ctx.stroke();
+                return patternCanvas;
+            };
+            canvas.freeDrawingBrush = hlineBrush;
             break;
         case 'vline':
-            const vLineBrush = new fabric.VLineBrush(canvas);
-            vLineBrush.width = canvas.freeDrawingBrush.width;
-            vLineBrush.color = canvas.freeDrawingBrush.color;
-            canvas.freeDrawingBrush = vLineBrush;
+            const vlineBrush = new fabric.PatternBrush(canvas);
+            vlineBrush.getPatternSrc = function() {
+                const patternCanvas = fabric.document.createElement('canvas');
+                patternCanvas.width = patternCanvas.height = 10;
+                const ctx = patternCanvas.getContext('2d');
+                ctx.strokeStyle = canvas.freeDrawingBrush.color;
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(5, 0);
+                ctx.lineTo(5, 10);
+                ctx.closePath();
+                ctx.stroke();
+                return patternCanvas;
+            };
+            canvas.freeDrawingBrush = vlineBrush;
             break;
         case 'square':
-            const squareBrush = new fabric.SquareBrush(canvas);
-            squareBrush.width = canvas.freeDrawingBrush.width;
-            squareBrush.color = canvas.freeDrawingBrush.color;
+            const squareBrush = new fabric.PatternBrush(canvas);
+            squareBrush.getPatternSrc = function() {
+                const patternCanvas = fabric.document.createElement('canvas');
+                patternCanvas.width = patternCanvas.height = 10;
+                const ctx = patternCanvas.getContext('2d');
+                ctx.fillStyle = canvas.freeDrawingBrush.color;
+                ctx.fillRect(0, 0, 10, 10);
+                return patternCanvas;
+            };
             canvas.freeDrawingBrush = squareBrush;
             break;
-        default:
-            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
     }
 }
 
-// Adding buttons to change brush types
-const brushTypes = ['pencil', 'spray', 'circle', 'hline', 'vline', 'square'];
-brushTypes.forEach(type => {
-    const button = document.createElement('button');
-    button.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-    button.addEventListener('click', () => setBrush(type));
-    document.body.appendChild(button);
-});
+// Event listeners for brush buttons
+document.getElementById('pencilBrush').addEventListener('click', () => setBrush('pencil'));
+document.getElementById('sprayBrush').addEventListener('click', () => setBrush('spray'));
+document.getElementById('patternBrush').addEventListener('click', () => setBrush('pattern'));
+document.getElementById('circleBrush').addEventListener('click', () => setBrush('circle'));
+document.getElementById('hlineBrush').addEventListener('click', () => setBrush('hline'));
+document.getElementById('vlineBrush').addEventListener('click', () => setBrush('vline'));
+document.getElementById('squareBrush').addEventListener('click', () => setBrush('square'));
 
 function undoAction() {
     if (history.length > 1) {
@@ -307,47 +356,30 @@ function mirrorHorizontal() {
     }
 }
 
-// Function to add watermark to the canvas for download
-function addWatermarkToCanvas(callback) {
-    fabric.Image.fromURL(watermarkImageUrl, function(img) {
-        watermark = img;
-        watermark.set({
-            selectable: false,
-            evented: false,
-            left: canvas.width - watermark.width - 10,
-            top: canvas.height - watermark.height - 10
-        });
-        canvas.add(watermark);
-        canvas.renderAll();
-        if (callback) callback();
-    }, { crossOrigin: 'anonymous' });
-}
-
-// Function to remove watermark from the canvas after download
-function removeWatermarkFromCanvas() {
-    if (watermark) {
-        canvas.remove(watermark);
-        canvas.renderAll();
-    }
-}
-
 function downloadImage() {
     if (canvas.getObjects().length === 0) {
         console.error("Canvas is empty. Please add an image before downloading.");
         return;
     }
 
-    addWatermarkToCanvas(() => {
+    // Temporarily add the watermark
+    const tempWatermark = new fabric.Image.fromURL(watermarkImageUrl, function(img) {
+        img.set({
+            top: 10,
+            left: 10,
+            opacity: 0.5,
+            selectable: false,
+            evented: false
+        });
+        canvas.add(img);
+        canvas.renderAll();
         const dataURL = canvas.toDataURL({ format: 'png' });
-        console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
-
         const link = document.createElement('a');
         link.href = dataURL;
         link.download = 'bobby.png';
         link.click();
-
-        removeWatermarkFromCanvas();
-    });
+        canvas.remove(img);
+    }, { crossOrigin: 'anonymous' });
 }
 
 function updateHistory() {
@@ -449,16 +481,3 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory(); 
-
-// Load the initial main image on the canvas
-fabric.Image.fromURL(mainImageUrl, function(img) {
-    adjustImageToFrame(img);
-    img.set({
-        selectable: false,  // Make the main image static
-        evented: false      // Prevent any interaction with the main image
-    });
-    canvas.add(img);
-    updateHistory(); // Add initial state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
-}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
