@@ -2,6 +2,7 @@ const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
+const watermarkUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png'; // URL for the watermark image
 
 const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
@@ -263,19 +264,32 @@ function downloadImage() {
         console.error("Canvas is empty. Please add an image before downloading.");
         return;
     }
-    
-    const dataURL = canvas.toDataURL({ format: 'png' });
-    console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
 
-       // Use the appropriate approach based on the hosting environment
-    try {
-        document.body.appendChild(link); // Append link to body for some environments
+    fabric.Image.fromURL(watermarkUrl, function(watermarkImg) {
+        watermarkImg.scaleToWidth(100); // Adjust the size of the watermark as needed
+        watermarkImg.scaleToHeight(100);
+        watermarkImg.set({
+            left: canvas.width - watermarkImg.getScaledWidth() - 10,
+            top: canvas.height - watermarkImg.getScaledHeight() - 10,
+            selectable: false,  // Make the watermark non-interactive
+            evented: false      // Prevent any interaction with the watermark
+        });
+
+        canvas.add(watermarkImg);
+        canvas.renderAll();
+
+        // Generate the data URL after adding the watermark
+        const dataURL = canvas.toDataURL({ format: 'png' });
+
+        // Remove the watermark after generating the data URL
+        canvas.remove(watermarkImg);
+
+        // Download the image
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'bobby.png';
         link.click();
-        document.body.removeChild(link); // Remove the link after download
-    } catch (error) {
-        console.error("Download failed: ", error);
-        window.open(link.href); // Fallback for environments where appending to body fails
-    }
+    }, { crossOrigin: 'anonymous' });
 }
 
 function updateHistory() {
