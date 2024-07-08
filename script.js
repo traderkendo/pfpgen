@@ -4,6 +4,8 @@ const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main
 const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
 const watermarkImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png'; // URL for the watermark image
 
+let watermark; // Variable to store the watermark object
+
 const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/afropainting.png',
@@ -117,7 +119,6 @@ document.getElementById('sizeChanger').addEventListener('input', updateBrushSize
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
 document.getElementById('download').addEventListener('click', downloadImage);
-document.getElementById('brushesDropdown').addEventListener('change', changeBrushType);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
@@ -161,32 +162,6 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
     updateHistory(); // Add initial state to history
     updateLayerManager(); // Update layer manager
     canvas.renderAll();
-}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
-
-// Load watermark image
-fabric.Image.fromURL(watermarkImageUrl, function(img) {
-    img.set({
-        left: 10, // Position the watermark
-        top: 10,  // Position the watermark
-        selectable: false,
-        evented: false
-    });
-    canvas.add(img);
-    canvas.bringToFront(img); // Ensure the watermark is on top
-    canvas.renderAll();
-
-    // Function to include watermark in downloaded image
-    function addWatermarkForDownload() {
-        canvas.add(img);
-        canvas.renderAll();
-        setTimeout(() => {
-            downloadCanvasImage();
-            canvas.remove(img);
-            canvas.renderAll();
-        }, 100);
-    }
-
-    document.getElementById('download').addEventListener('click', addWatermarkForDownload);
 }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
 function handleUpload(event) {
@@ -266,70 +241,6 @@ function updateBrushSize(event) {
     canvas.freeDrawingBrush.width = parseInt(size, 10);
 }
 
-function changeBrushType(event) {
-    const brushType = event.target.value;
-    switch (brushType) {
-        case 'pencil':
-            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-            break;
-        case 'spray':
-            canvas.freeDrawingBrush = new fabric.SprayBrush(canvas);
-            break;
-        case 'pattern':
-            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
-            break;
-        case 'circle':
-            canvas.freeDrawingBrush = new fabric.CircleBrush(canvas);
-            break;
-        case 'hline':
-            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
-            canvas.freeDrawingBrush.getPatternSrc = function () {
-                const patternCanvas = fabric.document.createElement('canvas');
-                patternCanvas.width = patternCanvas.height = 10;
-                const ctx = patternCanvas.getContext('2d');
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.moveTo(0, 5);
-                ctx.lineTo(10, 5);
-                ctx.closePath();
-                ctx.stroke();
-                return patternCanvas;
-            };
-            break;
-        case 'vline':
-            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
-            canvas.freeDrawingBrush.getPatternSrc = function () {
-                const patternCanvas = fabric.document.createElement('canvas');
-                patternCanvas.width = patternCanvas.height = 10;
-                const ctx = patternCanvas.getContext('2d');
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.moveTo(5, 0);
-                ctx.lineTo(5, 10);
-                ctx.closePath();
-                ctx.stroke();
-                return patternCanvas;
-            };
-            break;
-        case 'square':
-            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
-            canvas.freeDrawingBrush.getPatternSrc = function () {
-                const squareWidth = 10;
-                const patternCanvas = fabric.document.createElement('canvas');
-                patternCanvas.width = patternCanvas.height = squareWidth;
-                const ctx = patternCanvas.getContext('2d');
-                ctx.fillStyle = this.color;
-                ctx.fillRect(0, 0, squareWidth, squareWidth);
-                return patternCanvas;
-            };
-            break;
-        default:
-            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-    }
-}
-
 function undoAction() {
     if (history.length > 1) {
         history.pop();
@@ -350,19 +261,47 @@ function mirrorHorizontal() {
     }
 }
 
+// Function to add watermark to the canvas for download
+function addWatermarkToCanvas(callback) {
+    fabric.Image.fromURL(watermarkImageUrl, function(img) {
+        watermark = img;
+        watermark.set({
+            selectable: false,
+            evented: false,
+            left: canvas.width - watermark.width - 10,
+            top: canvas.height - watermark.height - 10
+        });
+        canvas.add(watermark);
+        canvas.renderAll();
+        if (callback) callback();
+    }, { crossOrigin: 'anonymous' });
+}
+
+// Function to remove watermark from the canvas after download
+function removeWatermarkFromCanvas() {
+    if (watermark) {
+        canvas.remove(watermark);
+        canvas.renderAll();
+    }
+}
+
 function downloadImage() {
     if (canvas.getObjects().length === 0) {
         console.error("Canvas is empty. Please add an image before downloading.");
         return;
     }
-    
-    const dataURL = canvas.toDataURL({ format: 'png' });
-    console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
 
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = 'bobby.png';
-    link.click();
+    addWatermarkToCanvas(() => {
+        const dataURL = canvas.toDataURL({ format: 'png' });
+        console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
+
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'bobby.png';
+        link.click();
+
+        removeWatermarkFromCanvas();
+    });
 }
 
 function updateHistory() {
@@ -463,4 +402,17 @@ canvas.on('object:modified', updateHistory);
 canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
-updateHistory();
+updateHistory(); 
+
+// Load the initial main image on the canvas
+fabric.Image.fromURL(mainImageUrl, function(img) {
+    adjustImageToFrame(img);
+    img.set({
+        selectable: false,  // Make the main image static
+        evented: false      // Prevent any interaction with the main image
+    });
+    canvas.add(img);
+    updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
+}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
