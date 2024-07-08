@@ -267,10 +267,15 @@ function downloadImage() {
     const dataURL = canvas.toDataURL({ format: 'png' });
     console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
 
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = 'bobby.png';
-    link.click();
+       // Use the appropriate approach based on the hosting environment
+    try {
+        document.body.appendChild(link); // Append link to body for some environments
+        link.click();
+        document.body.removeChild(link); // Remove the link after download
+    } catch (error) {
+        console.error("Download failed: ", error);
+        window.open(link.href); // Fallback for environments where appending to body fails
+    }
 }
 
 function updateHistory() {
