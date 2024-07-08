@@ -115,7 +115,7 @@ document.getElementById('colorPicker').addEventListener('change', updateBrushCol
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
-document.getElementById('download').addEventListener('click', downloadImage);
+document.getElementById('screenshot').addEventListener('click', takeScreenshot);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
@@ -168,7 +168,6 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
-            img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
             canvas.add(img);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -181,8 +180,8 @@ function handleUpload(event) {
 function addBobbyImage() {
     fabric.Image.fromURL(bobbyImageUrl, function(img) {
         adjustImageToFrame(img);
-        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
+        img.moveTo(canvas.getObjects().length - 1); // Move to the front
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
@@ -192,8 +191,8 @@ function addBobbyImage() {
 function addBobbyHeadImage() {
     fabric.Image.fromURL(bobbyHeadImageUrl, function(img) {
         adjustImageToFrame(img);
-        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
+        img.moveTo(canvas.getObjects().length - 1); // Move to the front
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
@@ -205,8 +204,8 @@ function duplicateImage() {
     if (activeObject) {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
-            clone.moveTo(canvas.getObjects().length - 1); // Ensure duplicated image is above the main image
             canvas.add(clone);
+            clone.moveTo(canvas.getObjects().length - 1); // Move to the front
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
             canvas.renderAll();
@@ -262,19 +261,18 @@ function mirrorHorizontal() {
     }
 }
 
-function downloadImage() {
+function takeScreenshot() {
     if (canvas.getObjects().length === 0) {
-        console.error("Canvas is empty. Please add an image before downloading.");
+        console.error("Canvas is empty. Please add an image before taking a screenshot.");
         return;
     }
-    
-    const dataURL = canvas.toDataURL({ format: 'png' });
-    console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
 
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = 'bobby.png';
-    link.click();
+    html2canvas(document.querySelector(".canvas-container")).then(canvasScreenshot => {
+        const link = document.createElement('a');
+        link.href = canvasScreenshot.toDataURL("image/png");
+        link.download = 'bobby_screenshot.png';
+        link.click();
+    });
 }
 
 function updateHistory() {
@@ -330,8 +328,8 @@ function updateLayerManager() {
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
-        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
+        img.moveTo(canvas.getObjects().length - 1); // Move to the front
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
@@ -385,6 +383,7 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
         evented: false      // Prevent any interaction with the main image
     });
     canvas.add(img);
+    img.moveTo(0); // Ensure main image is at the bottom
     updateHistory(); // Add initial state to history
     updateLayerManager(); // Update layer manager
     canvas.renderAll();
