@@ -2,7 +2,6 @@ const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
-const watermarkImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png'; // URL for the watermark image
 
 const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
@@ -148,29 +147,19 @@ function adjustImageToFrame(img) {
     });
 }
 
-// Load the main image and the watermark image
-fabric.Image.fromURL(mainImageUrl, function(mainImg) {
-    adjustImageToFrame(mainImg);
-    mainImg.set({
+// Load initial image
+fabric.Image.fromURL(mainImageUrl, function(img) {
+    adjustImageToFrame(img);
+    img.set({
         selectable: false,  // Make the main image static
         evented: false      // Prevent any interaction with the main image
     });
-    canvas.add(mainImg);
-    
-    fabric.Image.fromURL(watermarkImageUrl, function(watermarkImg) {
-        adjustImageToFrame(watermarkImg);
-        watermarkImg.set({
-            selectable: false,  // Make the watermark image static
-            evented: false      // Prevent any interaction with the watermark image
-        });
-        canvas.add(watermarkImg);
-        watermarkImg.bringToFront(); // Ensure watermark stays on top
-
-        updateHistory(); // Add initial state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
-    }, { crossOrigin: 'anonymous' });
-}, { crossOrigin: 'anonymous' });
+    console.log("Main image properties:", img.selectable, img.evented); // Log properties to verify
+    canvas.add(img);
+    updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
+}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
 function handleUpload(event) {
     const file = event.target.files[0];
@@ -179,6 +168,7 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
+            img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
             canvas.add(img);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -191,6 +181,7 @@ function handleUpload(event) {
 function addBobbyImage() {
     fabric.Image.fromURL(bobbyImageUrl, function(img) {
         adjustImageToFrame(img);
+        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -201,6 +192,7 @@ function addBobbyImage() {
 function addBobbyHeadImage() {
     fabric.Image.fromURL(bobbyHeadImageUrl, function(img) {
         adjustImageToFrame(img);
+        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -213,6 +205,7 @@ function duplicateImage() {
     if (activeObject) {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
+            clone.moveTo(canvas.getObjects().length - 1); // Ensure duplicated image is above the main image
             canvas.add(clone);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -337,7 +330,7 @@ function updateLayerManager() {
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
-        adjustImageToFrame(img);
+        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -383,3 +376,16 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
+
+// Load the initial main image on the canvas
+fabric.Image.fromURL(mainImageUrl, function(img) {
+    adjustImageToFrame(img);
+    img.set({
+        selectable: false,  // Make the main image static
+        evented: false      // Prevent any interaction with the main image
+    });
+    canvas.add(img);
+    updateHistory(); // Add initial state to history
+    updateLayerManager(); // Update layer manager
+    canvas.renderAll();
+}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
