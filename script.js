@@ -264,15 +264,6 @@ function setBrush(type) {
         case 'spray':
             canvas.freeDrawingBrush = new fabric.SprayBrush(canvas);
             break;
-        case 'pattern':
-            const img = new Image();
-            img.src = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/pixelpattern.png';
-            img.onload = function() {
-                const patternBrush = new fabric.PatternBrush(canvas);
-                patternBrush.source = img;
-                canvas.freeDrawingBrush = patternBrush;
-            };
-            break;
         case 'circle':
             const circleBrush = new fabric.CircleBrush(canvas);
             circleBrush.width = canvas.freeDrawingBrush.width;
