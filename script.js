@@ -2,6 +2,7 @@ const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
+const watermarkImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png'; // URL for the watermark image
 
 let watermark; // Variable to store the watermark object
 
@@ -163,25 +164,6 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
     canvas.renderAll();
 }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
-function downloadImage() {
-    if (canvas.getObjects().length === 0) {
-        console.error("Canvas is empty. Please add an image before downloading.");
-        return;
-    }
-
-    addWatermarkToCanvas(() => {
-        const dataURL = canvas.toDataURL({ format: 'png' });
-        console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
-
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'bobby.png';
-        link.click();
-
-        removeWatermarkFromCanvas();
-    });
-}
-
 function handleUpload(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -189,7 +171,6 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
-            img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
             canvas.add(img);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -202,7 +183,6 @@ function handleUpload(event) {
 function addBobbyImage() {
     fabric.Image.fromURL(bobbyImageUrl, function(img) {
         adjustImageToFrame(img);
-        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -213,7 +193,6 @@ function addBobbyImage() {
 function addBobbyHeadImage() {
     fabric.Image.fromURL(bobbyHeadImageUrl, function(img) {
         adjustImageToFrame(img);
-        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -226,7 +205,6 @@ function duplicateImage() {
     if (activeObject) {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
-            clone.moveTo(canvas.getObjects().length - 1); // Ensure duplicated image is above the main image
             canvas.add(clone);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -283,19 +261,47 @@ function mirrorHorizontal() {
     }
 }
 
+// Function to add watermark to the canvas for download
+function addWatermarkToCanvas(callback) {
+    fabric.Image.fromURL(watermarkImageUrl, function(img) {
+        watermark = img;
+        watermark.set({
+            selectable: false,
+            evented: false,
+            left: canvas.width - watermark.width - 10,
+            top: canvas.height - watermark.height - 10
+        });
+        canvas.add(watermark);
+        canvas.renderAll();
+        if (callback) callback();
+    }, { crossOrigin: 'anonymous' });
+}
+
+// Function to remove watermark from the canvas after download
+function removeWatermarkFromCanvas() {
+    if (watermark) {
+        canvas.remove(watermark);
+        canvas.renderAll();
+    }
+}
+
 function downloadImage() {
     if (canvas.getObjects().length === 0) {
         console.error("Canvas is empty. Please add an image before downloading.");
         return;
     }
-    
-    const dataURL = canvas.toDataURL({ format: 'png' });
-    console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
 
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = 'bobby.png';
-    link.click();
+    addWatermarkToCanvas(() => {
+        const dataURL = canvas.toDataURL({ format: 'png' });
+        console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
+
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'bobby.png';
+        link.click();
+
+        removeWatermarkFromCanvas();
+    });
 }
 
 function updateHistory() {
@@ -351,7 +357,7 @@ function updateLayerManager() {
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
-        img.moveTo(canvas.getObjects().length - 1); // Ensure new image is above the main image
+        img.moveTo(canvas.getObjects().length - 1);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -396,7 +402,7 @@ canvas.on('object:modified', updateHistory);
 canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
-updateHistory();
+updateHistory(); 
 
 // Load the initial main image on the canvas
 fabric.Image.fromURL(mainImageUrl, function(img) {
