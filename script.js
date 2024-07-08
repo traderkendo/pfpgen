@@ -2,7 +2,7 @@ const canvas = new fabric.Canvas('canvas');
 const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobby.jpg'; // URL of the main image
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
-const watermarkImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png'; // URL of the watermark image
+const watermarkImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png'; // URL for the watermark image
 
 const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
@@ -148,19 +148,29 @@ function adjustImageToFrame(img) {
     });
 }
 
-// Load initial image
-fabric.Image.fromURL(mainImageUrl, function(img) {
-    adjustImageToFrame(img);
-    img.set({
+// Load the main image and the watermark image
+fabric.Image.fromURL(mainImageUrl, function(mainImg) {
+    adjustImageToFrame(mainImg);
+    mainImg.set({
         selectable: false,  // Make the main image static
         evented: false      // Prevent any interaction with the main image
     });
-    console.log("Main image properties:", img.selectable, img.evented); // Log properties to verify
-    canvas.add(img);
-    updateHistory(); // Add initial state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
-}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+    canvas.add(mainImg);
+    
+    fabric.Image.fromURL(watermarkImageUrl, function(watermarkImg) {
+        adjustImageToFrame(watermarkImg);
+        watermarkImg.set({
+            selectable: false,  // Make the watermark image static
+            evented: false      // Prevent any interaction with the watermark image
+        });
+        canvas.add(watermarkImg);
+        watermarkImg.bringToFront(); // Ensure watermark stays on top
+
+        updateHistory(); // Add initial state to history
+        updateLayerManager(); // Update layer manager
+        canvas.renderAll();
+    }, { crossOrigin: 'anonymous' });
+}, { crossOrigin: 'anonymous' });
 
 function handleUpload(event) {
     const file = event.target.files[0];
@@ -173,7 +183,6 @@ function handleUpload(event) {
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
             canvas.renderAll();
-            drawWatermark(); // Ensure watermark stays on top
         });
     };
     reader.readAsDataURL(file);
@@ -186,7 +195,6 @@ function addBobbyImage() {
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
-        drawWatermark(); // Ensure watermark stays on top
     }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 }
 
@@ -197,7 +205,6 @@ function addBobbyHeadImage() {
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
-        drawWatermark(); // Ensure watermark stays on top
     }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 }
 
@@ -210,7 +217,6 @@ function duplicateImage() {
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
             canvas.renderAll();
-            drawWatermark(); // Ensure watermark stays on top
         });
     }
 }
@@ -225,7 +231,6 @@ function zoomImage(factor) {
         activeObject.setCoords();
         updateHistory(); // Add state to history
         canvas.renderAll();
-        drawWatermark(); // Ensure watermark stays on top
     }
 }
 
@@ -251,7 +256,6 @@ function undoAction() {
         canvas.loadFromJSON(state, function() {
             canvas.renderAll();
             updateLayerManager(); // Update layer manager
-            drawWatermark(); // Ensure watermark stays on top
         });
     }
 }
@@ -262,7 +266,6 @@ function mirrorHorizontal() {
         activeObject.set('flipX', !activeObject.flipX);
         updateHistory(); // Add state to history
         canvas.renderAll();
-        drawWatermark(); // Ensure watermark stays on top
     }
 }
 
@@ -271,10 +274,7 @@ function downloadImage() {
         console.error("Canvas is empty. Please add an image before downloading.");
         return;
     }
-
-    // Draw the watermark before downloading
-    drawWatermark();
-
+    
     const dataURL = canvas.toDataURL({ format: 'png' });
     console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
 
@@ -303,7 +303,6 @@ function updateLayerManager() {
             layerItem.addEventListener('click', () => {
                 canvas.setActiveObject(obj);
                 canvas.renderAll();
-                drawWatermark(); // Ensure watermark stays on top
             });
 
             layerManager.appendChild(layerItem);
@@ -330,7 +329,6 @@ function updateLayerManager() {
             });
             canvas.renderAll();
             updateHistory(); // Update history after reordering
-            drawWatermark(); // Ensure watermark stays on top
         }
     });
 }
@@ -339,12 +337,11 @@ function updateLayerManager() {
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
-        img.moveTo(canvas.getObjects().length - 1);
+        adjustImageToFrame(img);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
-        drawWatermark(); // Ensure watermark stays on top
     }, { crossOrigin: 'anonymous' });
 }
 
@@ -379,44 +376,10 @@ canvas.on('object:added', function(obj) {
     if (obj.target && (obj.target.type === 'image' || obj.target.type === 'group' || obj.target.type === 'path')) {
         updateHistory();
         updateLayerManager();
-        drawWatermark(); // Ensure watermark stays on top
     }
 });
-canvas.on('object:modified', () => {
-    updateHistory();
-    drawWatermark(); // Ensure watermark stays on top
-});
-canvas.on('object:removed', () => {
-    updateHistory();
-    drawWatermark(); // Ensure watermark stays on top
-});
+canvas.on('object:modified', updateHistory);
+canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
-updateHistory(); 
-
-// Load the initial main image on the canvas
-fabric.Image.fromURL(mainImageUrl, function(img) {
-    adjustImageToFrame(img);
-    img.set({
-        selectable: false,  // Make the main image static
-        evented: false      // Prevent any interaction with the main image
-    });
-    canvas.add(img);
-    updateHistory(); // Add initial state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
-    drawWatermark(); // Ensure watermark stays on top
-}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
-
-// Load watermark image and draw it on the canvas context
-const watermarkImage = new Image();
-watermarkImage.src = watermarkImageUrl;
-watermarkImage.crossOrigin = 'anonymous';
-watermarkImage.onload = function() {
-    drawWatermark();
-};
-
-function drawWatermark() {
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(watermarkImage, 0, 0, canvas.width, canvas.height);
-}
+updateHistory();
