@@ -19,11 +19,11 @@
     </style>
 </head>
 <body>
-    <div class="container">
+   <div class="container">
         <h1>Your Bobby</h1>
         <input type="file" id="upload" accept="image/*">
         <button id="addBobby">Add $Bobby</button>
-        <button id="addBobbyHead">Add $Bobby Head</button> <!-- Add $Bobby Head button -->
+        <button id="addBobbyHead">Add $Bobby Head</button>
         <button id="duplicate">Duplicate</button>
         <button id="zoomIn">Zoom In</button>
         <button id="zoomOut">Zoom Out</button>
@@ -37,7 +37,7 @@
         <select id="layerManager" size="5" multiple></select>
         <div class="canvas-container">
             <canvas id="canvas" width="500" height="500"></canvas>
-            <img src="https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png" class="watermark" id="watermark">
+            <img src="https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png" id="watermark" alt="Watermark" style="position: absolute; top: 50px; left: 50px; pointer-events: none;">
             <div id="imageGalleryContainer">
                 <h2>Select Images</h2>
                 <div id="imageGallery"></div>
