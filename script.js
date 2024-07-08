@@ -3,6 +3,8 @@ const mainImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/
 const bobbyImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/bobbybg.png'; // New URL for the $Bobby image
 const bobbyHeadImageUrl = 'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/bobby-removebg-preview-fotor-bg-remover-20240707135640.png'; // NEW URL for the $Bobby head image
 
+let watermark; // Variable to store the watermark object
+
 const imageUrls = [
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/FBI-removebg-preview.png',
     'https://raw.githubusercontent.com/traderkendo/pfpgen/main/images/afropainting.png',
@@ -160,6 +162,25 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
     updateLayerManager(); // Update layer manager
     canvas.renderAll();
 }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+
+function downloadImage() {
+    if (canvas.getObjects().length === 0) {
+        console.error("Canvas is empty. Please add an image before downloading.");
+        return;
+    }
+
+    addWatermarkToCanvas(() => {
+        const dataURL = canvas.toDataURL({ format: 'png' });
+        console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
+
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'bobby.png';
+        link.click();
+
+        removeWatermarkFromCanvas();
+    });
+}
 
 function handleUpload(event) {
     const file = event.target.files[0];
