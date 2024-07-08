@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Bobby Generator</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .canvas-container {
+            position: relative;
+        }
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -25,6 +37,7 @@
         <select id="layerManager" size="5" multiple></select>
         <div class="canvas-container">
             <canvas id="canvas" width="500" height="500"></canvas>
+            <img src="https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png" class="watermark" id="watermark">
             <div id="imageGalleryContainer">
                 <h2>Select Images</h2>
                 <div id="imageGallery"></div>
