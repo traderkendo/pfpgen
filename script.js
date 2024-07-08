@@ -117,6 +117,7 @@ document.getElementById('sizeChanger').addEventListener('input', updateBrushSize
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
 document.getElementById('download').addEventListener('click', downloadImage);
+document.getElementById('brushesDropdown').addEventListener('change', changeBrushType);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
@@ -165,14 +166,27 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
 // Load watermark image
 fabric.Image.fromURL(watermarkImageUrl, function(img) {
     img.set({
-        selectable: false,  // Make the watermark static
-        evented: false,     // Prevent any interaction with the watermark
-        top: 10,            // Position the watermark
-        left: 10,
-        opacity: 0.5        // Set opacity to make it look like a watermark
+        left: 10, // Position the watermark
+        top: 10,  // Position the watermark
+        selectable: false,
+        evented: false
     });
     canvas.add(img);
+    canvas.bringToFront(img); // Ensure the watermark is on top
     canvas.renderAll();
+
+    // Function to include watermark in downloaded image
+    function addWatermarkForDownload() {
+        canvas.add(img);
+        canvas.renderAll();
+        setTimeout(() => {
+            downloadCanvasImage();
+            canvas.remove(img);
+            canvas.renderAll();
+        }, 100);
+    }
+
+    document.getElementById('download').addEventListener('click', addWatermarkForDownload);
 }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
 
 function handleUpload(event) {
@@ -182,7 +196,6 @@ function handleUpload(event) {
         const data = f.target.result;
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
-            img.moveTo(canvas.getObjects().length - 1);
             canvas.add(img);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -195,7 +208,6 @@ function handleUpload(event) {
 function addBobbyImage() {
     fabric.Image.fromURL(bobbyImageUrl, function(img) {
         adjustImageToFrame(img);
-        img.moveTo(canvas.getObjects().length - 1);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -206,7 +218,6 @@ function addBobbyImage() {
 function addBobbyHeadImage() {
     fabric.Image.fromURL(bobbyHeadImageUrl, function(img) {
         adjustImageToFrame(img);
-        img.moveTo(canvas.getObjects().length - 1);
         canvas.add(img);
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
@@ -219,7 +230,6 @@ function duplicateImage() {
     if (activeObject) {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
-            clone.moveTo(canvas.getObjects().length - 1);
             canvas.add(clone);
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
@@ -256,26 +266,28 @@ function updateBrushSize(event) {
     canvas.freeDrawingBrush.width = parseInt(size, 10);
 }
 
-function setBrush(type) {
-    switch(type) {
+function changeBrushType(event) {
+    const brushType = event.target.value;
+    switch (brushType) {
         case 'pencil':
             canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
             break;
         case 'spray':
             canvas.freeDrawingBrush = new fabric.SprayBrush(canvas);
             break;
+        case 'pattern':
+            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
+            break;
         case 'circle':
-            const circleBrush = new fabric.CircleBrush(canvas);
-            circleBrush.width = canvas.freeDrawingBrush.width;
-            canvas.freeDrawingBrush = circleBrush;
+            canvas.freeDrawingBrush = new fabric.CircleBrush(canvas);
             break;
         case 'hline':
-            const hlineBrush = new fabric.PatternBrush(canvas);
-            hlineBrush.getPatternSrc = function() {
+            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
+            canvas.freeDrawingBrush.getPatternSrc = function () {
                 const patternCanvas = fabric.document.createElement('canvas');
                 patternCanvas.width = patternCanvas.height = 10;
                 const ctx = patternCanvas.getContext('2d');
-                ctx.strokeStyle = canvas.freeDrawingBrush.color;
+                ctx.strokeStyle = this.color;
                 ctx.lineWidth = 5;
                 ctx.beginPath();
                 ctx.moveTo(0, 5);
@@ -284,15 +296,14 @@ function setBrush(type) {
                 ctx.stroke();
                 return patternCanvas;
             };
-            canvas.freeDrawingBrush = hlineBrush;
             break;
         case 'vline':
-            const vlineBrush = new fabric.PatternBrush(canvas);
-            vlineBrush.getPatternSrc = function() {
+            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
+            canvas.freeDrawingBrush.getPatternSrc = function () {
                 const patternCanvas = fabric.document.createElement('canvas');
                 patternCanvas.width = patternCanvas.height = 10;
                 const ctx = patternCanvas.getContext('2d');
-                ctx.strokeStyle = canvas.freeDrawingBrush.color;
+                ctx.strokeStyle = this.color;
                 ctx.lineWidth = 5;
                 ctx.beginPath();
                 ctx.moveTo(5, 0);
@@ -301,31 +312,23 @@ function setBrush(type) {
                 ctx.stroke();
                 return patternCanvas;
             };
-            canvas.freeDrawingBrush = vlineBrush;
             break;
         case 'square':
-            const squareBrush = new fabric.PatternBrush(canvas);
-            squareBrush.getPatternSrc = function() {
+            canvas.freeDrawingBrush = new fabric.PatternBrush(canvas);
+            canvas.freeDrawingBrush.getPatternSrc = function () {
+                const squareWidth = 10;
                 const patternCanvas = fabric.document.createElement('canvas');
-                patternCanvas.width = patternCanvas.height = 10;
+                patternCanvas.width = patternCanvas.height = squareWidth;
                 const ctx = patternCanvas.getContext('2d');
-                ctx.fillStyle = canvas.freeDrawingBrush.color;
-                ctx.fillRect(0, 0, 10, 10);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(0, 0, squareWidth, squareWidth);
                 return patternCanvas;
             };
-            canvas.freeDrawingBrush = squareBrush;
             break;
+        default:
+            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
     }
 }
-
-// Event listeners for brush buttons
-document.getElementById('pencilBrush').addEventListener('click', () => setBrush('pencil'));
-document.getElementById('sprayBrush').addEventListener('click', () => setBrush('spray'));
-document.getElementById('patternBrush').addEventListener('click', () => setBrush('pattern'));
-document.getElementById('circleBrush').addEventListener('click', () => setBrush('circle'));
-document.getElementById('hlineBrush').addEventListener('click', () => setBrush('hline'));
-document.getElementById('vlineBrush').addEventListener('click', () => setBrush('vline'));
-document.getElementById('squareBrush').addEventListener('click', () => setBrush('square'));
 
 function undoAction() {
     if (history.length > 1) {
@@ -352,25 +355,14 @@ function downloadImage() {
         console.error("Canvas is empty. Please add an image before downloading.");
         return;
     }
+    
+    const dataURL = canvas.toDataURL({ format: 'png' });
+    console.log("Data URL: ", dataURL); // Log the data URL to ensure it's generated
 
-    // Temporarily add the watermark
-    const tempWatermark = new fabric.Image.fromURL(watermarkImageUrl, function(img) {
-        img.set({
-            top: 10,
-            left: 10,
-            opacity: 0.5,
-            selectable: false,
-            evented: false
-        });
-        canvas.add(img);
-        canvas.renderAll();
-        const dataURL = canvas.toDataURL({ format: 'png' });
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'bobby.png';
-        link.click();
-        canvas.remove(img);
-    }, { crossOrigin: 'anonymous' });
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'bobby.png';
+    link.click();
 }
 
 function updateHistory() {
@@ -471,4 +463,4 @@ canvas.on('object:modified', updateHistory);
 canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
-updateHistory(); 
+updateHistory();
