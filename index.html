@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-  <div class="container">
+ <div class="container">
         <h1>Your Bobby</h1>
         <input type="file" id="upload" accept="image/*">
         <button id="addBobby">Add $Bobby</button>
@@ -34,10 +34,22 @@
         <button id="undo">Undo</button>
         <button id="mirrorHorizontal">Mirror Horizontal</button>
         <button id="download">Download</button>
+        
+        <!-- Brush selection dropdown menu -->
+        <label for="brushesDropdown">Brushes:</label>
+        <select id="brushesDropdown">
+            <option value="pencil">Pencil</option>
+            <option value="spray">Spray</option>
+            <option value="pattern">Pattern</option>
+            <option value="circle">Circle</option>
+            <option value="hline">Horizontal Line</option>
+            <option value="vline">Vertical Line</option>
+            <option value="square">Square</option>
+        </select>
+        
         <select id="layerManager" size="5" multiple></select>
         <div class="canvas-container">
             <canvas id="canvas" width="500" height="500"></canvas>
-            <img src="https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png" id="watermark" alt="Watermark" style="position: absolute; top: 36px; left: 0px; pointer-events: none;">
             <div id="imageGalleryContainer">
                 <h2>Select Images</h2>
                 <div id="imageGallery"></div>
@@ -45,19 +57,6 @@
                     <button id="prevPage">Previous</button>
                     <button id="nextPage">Next</button>
                 </div>
-            </div>
-        </div>
-    </div>
-        <!-- Dropdown menu for brushes -->
-        <div class="dropdown">
-            <button class="dropbtn">Brushes</button>
-            <div class="dropdown-content">
-                <button id="pencilBrush">Pencil</button>
-                <button id="sprayBrush">Spray</button>
-                <button id="circleBrush">Circle</button>
-                <button id="hlineBrush">HLine</button>
-                <button id="vlineBrush">VLine</button>
-                <button id="squareBrush">Square</button>
             </div>
         </div>
     </div>
