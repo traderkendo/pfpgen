@@ -265,6 +265,10 @@ function downloadImage() {
         return;
     }
 
+    // Generate the data URL after adding the watermark
+    const dataURL = canvas.toDataURL({ format: 'png' });
+
+    // Load the watermark image and add it to the canvas for download
     fabric.Image.fromURL(watermarkUrl, function(watermarkImg) {
         watermarkImg.scaleToWidth(100); // Adjust the size of the watermark as needed
         watermarkImg.scaleToHeight(100);
@@ -275,18 +279,19 @@ function downloadImage() {
             evented: false      // Prevent any interaction with the watermark
         });
 
+        // Add the watermark to the canvas
         canvas.add(watermarkImg);
         canvas.renderAll();
 
-        // Generate the data URL after adding the watermark
-        const dataURL = canvas.toDataURL({ format: 'png' });
+        // Generate the final data URL with the watermark
+        const finalDataURL = canvas.toDataURL({ format: 'png' });
 
-        // Remove the watermark after generating the data URL
+        // Remove the watermark from the canvas
         canvas.remove(watermarkImg);
 
         // Download the image
         const link = document.createElement('a');
-        link.href = dataURL;
+        link.href = finalDataURL;
         link.download = 'bobby.png';
         link.click();
     }, { crossOrigin: 'anonymous' });
