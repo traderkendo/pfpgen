@@ -115,7 +115,7 @@ document.getElementById('colorPicker').addEventListener('change', updateBrushCol
 document.getElementById('sizeChanger').addEventListener('input', updateBrushSize);
 document.getElementById('undo').addEventListener('click', undoAction);
 document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHorizontal);
-document.getElementById('screenshot').addEventListener('click', takeScreenshot);
+document.getElementById('screenshot').addEventListener('click', takeScreenshot); // Change to Screenshot
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
 
@@ -134,7 +134,6 @@ document.addEventListener('keydown', function(event) {
 let history = [];
 const maxHistorySize = 30;
 
-// Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
     const scaleX = canvas.width / img.width;
     const scaleY = canvas.height / img.height;
@@ -154,12 +153,29 @@ fabric.Image.fromURL(mainImageUrl, function(img) {
         selectable: false,  // Make the main image static
         evented: false      // Prevent any interaction with the main image
     });
-    console.log("Main image properties:", img.selectable, img.evented); // Log properties to verify
     canvas.add(img);
+    img.moveTo(0); // Ensure main image is at the bottom
+    loadWatermark(); // Load the watermark
     updateHistory(); // Add initial state to history
     updateLayerManager(); // Update layer manager
     canvas.renderAll();
-}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+}, { crossOrigin: 'anonymous' });
+
+function loadWatermark() {
+    fabric.Image.fromURL(watermarkUrl, function(watermark) {
+        watermark.set({
+            selectable: false,
+            evented: false,
+            top: 0,
+            left: 0,
+            scaleX: 0.5,
+            scaleY: 0.5
+        });
+        canvas.add(watermark);
+        watermark.moveTo(canvas.getObjects().length - 1); // Move watermark to the top
+        canvas.renderAll();
+    }, { crossOrigin: 'anonymous' });
+}
 
 function handleUpload(event) {
     const file = event.target.files[0];
@@ -169,6 +185,7 @@ function handleUpload(event) {
         fabric.Image.fromURL(data, function(img) {
             adjustImageToFrame(img);
             canvas.add(img);
+            img.moveTo(canvas.getObjects().length - 2); // Ensure watermark stays on top
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
             canvas.renderAll();
@@ -181,22 +198,22 @@ function addBobbyImage() {
     fabric.Image.fromURL(bobbyImageUrl, function(img) {
         adjustImageToFrame(img);
         canvas.add(img);
-        img.moveTo(canvas.getObjects().length - 1); // Move to the front
+        img.moveTo(canvas.getObjects().length - 2); // Ensure watermark stays on top
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
-    }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+    }, { crossOrigin: 'anonymous' });
 }
 
 function addBobbyHeadImage() {
     fabric.Image.fromURL(bobbyHeadImageUrl, function(img) {
         adjustImageToFrame(img);
         canvas.add(img);
-        img.moveTo(canvas.getObjects().length - 1); // Move to the front
+        img.moveTo(canvas.getObjects().length - 2); // Ensure watermark stays on top
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
-    }, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
+    }, { crossOrigin: 'anonymous' });
 }
 
 function duplicateImage() {
@@ -205,7 +222,7 @@ function duplicateImage() {
         activeObject.clone(function(clone) {
             clone.set({ left: clone.left + 10, top: clone.top + 10 });
             canvas.add(clone);
-            clone.moveTo(canvas.getObjects().length - 1); // Move to the front
+            clone.moveTo(canvas.getObjects().length - 2); // Ensure watermark stays on top
             updateHistory(); // Add state to history
             updateLayerManager(); // Update layer manager
             canvas.renderAll();
@@ -267,9 +284,9 @@ function takeScreenshot() {
         return;
     }
 
-    html2canvas(document.querySelector(".canvas-container")).then(canvasScreenshot => {
+    html2canvas(document.querySelector('.canvas-container')).then(canvasScreenshot => {
         const link = document.createElement('a');
-        link.href = canvasScreenshot.toDataURL("image/png");
+        link.href = canvasScreenshot.toDataURL('image/png');
         link.download = 'bobby_screenshot.png';
         link.click();
     });
@@ -318,6 +335,7 @@ function updateLayerManager() {
             objects.forEach((obj) => {
                 canvas.add(obj);
             });
+            loadWatermark(); // Re-add watermark to keep it on top
             canvas.renderAll();
             updateHistory(); // Update history after reordering
         }
@@ -328,8 +346,9 @@ function updateLayerManager() {
 function handleImageSelect(event) {
     const selectedImage = event.target.src;
     fabric.Image.fromURL(selectedImage, function(img) {
+        img.moveTo(canvas.getObjects().length - 1);
         canvas.add(img);
-        img.moveTo(canvas.getObjects().length - 1); // Move to the front
+        img.moveTo(canvas.getObjects().length - 2); // Ensure watermark stays on top
         updateHistory(); // Add state to history
         updateLayerManager(); // Update layer manager
         canvas.renderAll();
@@ -374,17 +393,3 @@ canvas.on('object:removed', updateHistory);
 
 // Initialize history with the initial state
 updateHistory();
-
-// Load the initial main image on the canvas
-fabric.Image.fromURL(mainImageUrl, function(img) {
-    adjustImageToFrame(img);
-    img.set({
-        selectable: false,  // Make the main image static
-        evented: false      // Prevent any interaction with the main image
-    });
-    canvas.add(img);
-    img.moveTo(0); // Ensure main image is at the bottom
-    updateHistory(); // Add initial state to history
-    updateLayerManager(); // Update layer manager
-    canvas.renderAll();
-}, { crossOrigin: 'anonymous' }); // Ensure cross-origin requests are handled
