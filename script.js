@@ -241,6 +241,52 @@ function updateBrushSize(event) {
     canvas.freeDrawingBrush.width = parseInt(size, 10);
 }
 
+function setBrush(type) {
+    switch(type) {
+        case 'pencil':
+            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+            break;
+        case 'spray':
+            canvas.freeDrawingBrush = new fabric.SprayBrush(canvas);
+            break;
+        case 'circle':
+            const circleBrush = new fabric.CircleBrush(canvas);
+            circleBrush.width = canvas.freeDrawingBrush.width;
+            circleBrush.color = canvas.freeDrawingBrush.color;
+            canvas.freeDrawingBrush = circleBrush;
+            break;
+        case 'hline':
+            const hLineBrush = new fabric.HLineBrush(canvas);
+            hLineBrush.width = canvas.freeDrawingBrush.width;
+            hLineBrush.color = canvas.freeDrawingBrush.color;
+            canvas.freeDrawingBrush = hLineBrush;
+            break;
+        case 'vline':
+            const vLineBrush = new fabric.VLineBrush(canvas);
+            vLineBrush.width = canvas.freeDrawingBrush.width;
+            vLineBrush.color = canvas.freeDrawingBrush.color;
+            canvas.freeDrawingBrush = vLineBrush;
+            break;
+        case 'square':
+            const squareBrush = new fabric.SquareBrush(canvas);
+            squareBrush.width = canvas.freeDrawingBrush.width;
+            squareBrush.color = canvas.freeDrawingBrush.color;
+            canvas.freeDrawingBrush = squareBrush;
+            break;
+        default:
+            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+    }
+}
+
+// Adding buttons to change brush types
+const brushTypes = ['pencil', 'spray', 'circle', 'hline', 'vline', 'square'];
+brushTypes.forEach(type => {
+    const button = document.createElement('button');
+    button.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+    button.addEventListener('click', () => setBrush(type));
+    document.body.appendChild(button);
+});
+
 function undoAction() {
     if (history.length > 1) {
         history.pop();
