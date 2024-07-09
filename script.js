@@ -121,7 +121,6 @@ document.getElementById('mirrorHorizontal').addEventListener('click', mirrorHori
 document.getElementById('download').addEventListener('click', downloadImage);
 document.getElementById('prevPage').addEventListener('click', () => changePage(-1));
 document.getElementById('nextPage').addEventListener('click', () => changePage(1));
-document.getElementById('addText').addEventListener('click', addText);
 
 // Add event listener for delete key
 document.addEventListener('keydown', function(event) {
@@ -138,25 +137,6 @@ document.addEventListener('keydown', function(event) {
 let history = [];
 const maxHistorySize = 30;
 
-function addText() {
-    const textContent = document.getElementById('textInput').value;
-    if (textContent) {
-        const text = new fabric.Text(textContent, {
-            left: canvas.width / 2,
-            top: canvas.height / 2,
-            fontSize: 30,
-            fill: '#000000',
-            originX: 'center',
-            originY: 'center',
-            editable: true
-        });
-        canvas.add(text);
-        canvas.setActiveObject(text);
-        updateHistory(); // Add state to history
-        updateLayerManager(); // Update layer manager
-        canvas.renderAll();
-    }
-}
 // Function to adjust image to fit the frame
 function adjustImageToFrame(img) {
     const scaleX = canvas.width / img.width;
