@@ -1,183 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Bobby Generator</title>
-    <link rel="icon" href="/src/icons/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="memestyles.css">
-    <link rel="stylesheet" href="global.css">
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
-    integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .canvas-container {
+            position: relative;
+        }
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="LOGO">
-            <a href="index.html" class="logo">
-                <img src="/src/icons/bobbybg.png" alt="$BOBBY Logo">
-            </a>
-            <div>
-            <h1>$BOBBY on Solana</h1>
-            <p>so tiny yet so cute</p>
-            </div>
-        </div>
-        <div class="navbar">
-          <ul class="links">
-            <li><a href="hero">Home</a></li>
-            <li><a href="https://x.com/BobbyCatOnSol" target="_blank">Twitter</a></li>
-            <li><a href="https://t.me/bobbycatCTO" target="_blank">Telegram</a></li>
-            <li><a href="https://solscan.io/token/48yNDqabAvGNfnkhadsV1MAvtp44fFDdHBRBdFhvpump" target="_blank">Solscan</a></li>
-            <li><a href="https://dexscreener.com/solana/6pgnsbb4xjdfouzejx7qdypibgrnlvopivtngf6xjyys" target="_blank">Dexscreener</a></li>
-            <li><a href="https://dropz.cc/e/wget_duf7jir75izwnfgz0vppe" target="_blank">Buy on Drops</a></li>
-            
-          </ul>
-          <a href="#" class="action_btn">Dexscreener</a>
-          <div class="toggle_btn">
-            <i class="fa-solid fa-bars"></i>
-          </div>
-        </div>
-  
-        <div class="dropdown_menu">
-            <li><a href="hero">Home</a></li>
-            <li><a href="https://x.com/BobbyCatOnSol" target="_blank">Twitter</a></li>
-            <li><a href="https://t.me/bobbycatCTO" target="_blank">Telegram</a></li>
-            <li><a href="https://solscan.io/token/48yNDqabAvGNfnkhadsV1MAvtp44fFDdHBRBdFhvpump" target="_blank">Solscan</a></li>
-            <li><a href="https://dexscreener.com/solana/6pgnsbb4xjdfouzejx7qdypibgrnlvopivtngf6xjyys" target="_blank">Dexscreener</a></li>
-            <li><a href="https://dropz.cc/e/wget_duf7jir75izwnfgz0vppe" target="_blank">Buy on Drops</a></li>
-          <li><a href="#" class="action_btn">Get Started</a></li>
-        </div>
-      </header>
-    <section class="Maincontainer">
-        <div class="Instructions">
-            <h2>How to use $bobby Generator? </h2>
-            <ul>
-                <li>•  Upload File: you can upload any image you like onto the canvas. An image without a background is recommended </li>
-                <li>•  •  Add $Bobby: will add a $Bobby without a background, that you can move around freely – same goes for “Add $Bobby Head”, except it’s just the Head :> </li>
-                <li> Duplicate: will duplicate the selected layer </li>
-                <li>•    •  Zoom in/out: if the added image is too big in size, simply adjust it with these buttons  </li>
-                <li>•  Draw: click on Draw to enter the drawing mode, and adjust the Color/Brush to your liking </li>
-                <li>•  Undo: the last steps that were made, even goes for each single stroke made with the drawing tool </li>
-                <li>•   Mirror Horizontal: will mirror the selected Layer horizontally </li>
-                <li>•   Select Images: easily select images from our library to customize your $bobby </li>
-            </ul>
-            <p>Every Image that is selected or added will add a layer that you can select and adjust to your preferences. 
-                The layers can be removed either by undoing the last step, or simply by using the “delete” button on your keyboard. </p>
-
-                <h3>Enjoy your freshly made $bobby meme by directly clicking the download button 😊</h3>
-        </div>
-        <div class="MEMEgen">
-            <div class="EDITField">
-                <div class="IMGcontroll">
-                    <div id="paginationControls">
-                        <h2>Select Traits</h2>
-                        <button id="prevPage">Previous</button>
-
-                        <button id="nextPage">Next</button>
-                    </div>
-
-                    <div id="imageGalleryContainer">
-                        <div id="imageGallery"></div>
-                    </div>
-
-                </div>
-                <div class="Btns">
-                    <div id="EditBtns">
-                        <h2>Edit Buttons</h2>
-                        <button id="addBobby">Add $Bobby</button>
-                        <button id="addBobbyHead">Add $Bobby Head</button>
-                        <button id="duplicate">Duplicate</button>
-                        <button id="zoomIn">Zoom In</button>
-                        <button id="zoomOut">Zoom Out</button>
-                        <button id="draw">Draw</button>
-                        <input type="color" id="colorPicker" value="#000000">
-                        <label for="sizeChanger">Brush Size: </label>
-                        <input type="range" id="sizeChanger" min="1" max="50" value="2">
-                        <button id="mirrorHorizontal">Mirror Horizontal</button>
-                        <select id="layerManager" size="5"></select>
-                    </div>                
-                </div> 
-            </div>
-                <div class="canvas-container">
-                    <div class="create">
-                    <div class="updown">
-                        <input type="file" id="upload" accept="image/*">
-                        <button id="download">Download</button>
-                        <button id="undo">Undo</button>
-                    </div>
-                    <div class="txtfield">
-                        <p>hajsdkasdhjsak</p>
-                    </div>
-                    <canvas id="canvas" width="500" height="500"></canvas>
+  <div class="container">
+        <h1>Your Bobby</h1>
+        <input type="file" id="upload" accept="image/*">
+        <button id="addBobby">Add $Bobby</button>
+        <button id="addBobbyHead">Add $Bobby Head</button>
+        <button id="duplicate">Duplicate</button>
+        <button id="zoomIn">Zoom In</button>
+        <button id="zoomOut">Zoom Out</button>
+        <button id="draw">Draw</button>
+        <input type="color" id="colorPicker" value="#000000">
+        <label for="sizeChanger">Brush Size: </label>
+        <input type="range" id="sizeChanger" min="1" max="50" value="2">
+        <button id="undo">Undo</button>
+        <button id="mirrorHorizontal">Mirror Horizontal</button>
+        <button id="download">Download</button>
+        <select id="layerManager" size="5" multiple></select>
+        <div class="canvas-container">
+            <canvas id="canvas" width="500" height="500"></canvas>
+            <img src="https://raw.githubusercontent.com/traderkendo/pfpgen/main/watermarkbobbyhead.png" id="watermark" alt="Watermark" style="position: absolute; top: 36px; left: 0px; pointer-events: none;">
+            <div id="imageGalleryContainer">
+                <h2>Select Images</h2>
+                <div id="imageGallery"></div>
+                <div id="paginationControls">
+                    <button id="prevPage">Previous</button>
+                    <button id="nextPage">Next</button>
                 </div>
             </div>
         </div>
-        <div>
-
-        </div>
-    </section>
-    <footer>
-        <!-- Footer Content -->
-        <div class="footer_content">
-          <div class="fcontainer">
-
-              <!-- Social Links -->
-              <div class="social_media_links">
-                <a href="http://facebook.com" target="_blank">
-                  <ion-icon class="icon" name="logo-facebook"></ion-icon>
-                </a>
-                <a href="http://instagram.com" target="_blank">
-                  <ion-icon class="icon" name="logo-instagram"></ion-icon>
-                </a>
-                <a href="https://x.com/BobbyCatOnSol" target="_blank">
-                  <ion-icon class="icon" name="logo-twitter"></ion-icon>
-                </a>
-                <a href="https://x.com/BobbyCatOnSol" target="_blank">
-                    <ion-icon class="icon" name="logo-telegram"></ion-icon>
-                  </a>
-                </div>
-                <div class="LOGO">
-                <a href="index.html" class="logo">
-                <img src="/src/icons/bobbybg.png" alt="$BOBBY Logo">
-                </a>
-                    <h2>$BOBBY ON SOLANA</h2>
-                </div>
-          </div>
-
-          <div class="footer_copyright">Copyright&copy;2024 $BOBBY on SOLANA - Contract Address:48yNDqabAvGNfnkhadsV1MAvtp44fFDdHBRBdFhvpump</div>
-        </div>
-      </footer>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pica/5.1.0/pica.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script src="script.js"></script>
-    <script>
-        const toggleBtn = document.querySelector('.toggle_btn')
-        const toggleBtnIcon = document.querySelector('.toggle_btn i')
-        const dropDownMenu = document.querySelector('.dropdown_menu')
-  
-        toggleBtn.onclick = function () {
-          dropDownMenu.classList.toggle('open')
-          const isOpen = dropDownMenu.classList.contains('open')
-  
-          toggleBtnIcon.classList = isOpen
-            ? 'fa-solid fa-xmark'
-            : 'fa-solid fa-bars'
-        }
-      </script>
-            <script
-            type="module"
-            src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
-          ></script>
-          <script
-            nomodule
-            src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
-          ></script>
 </body>
 </html>
